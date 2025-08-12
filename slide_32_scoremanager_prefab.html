@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScoreManager Prefab</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+        }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .prefab-visualization {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.75rem;
+            height: 250px;
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .prefab-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .prefab-icon {
+            width: 28px;
+            height: 28px;
+            background: #0078D7;
+            color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .prefab-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #0078D7;
+        }
+        
+        .prefab-content {
+            display: flex;
+            height: calc(100% - 45px);
+        }
+        
+        .prefab-hierarchy {
+            width: 180px;
+            border-right: 1px solid #e2e8f0;
+            padding-right: 0.75rem;
+            overflow-y: auto;
+        }
+        
+        .hierarchy-item {
+            display: flex;
+            align-items: center;
+            padding: 0.4rem 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+        
+        .hierarchy-item:hover {
+            background: #f0f7ff;
+        }
+        
+        .hierarchy-item.selected {
+            background: #f0f7ff;
+        }
+        
+        .hierarchy-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            color: #0078D7;
+            font-size: 0.8rem;
+        }
+        
+        .hierarchy-label {
+            font-size: 0.9rem;
+        }
+        
+        .prefab-inspector {
+            flex: 1;
+            padding-left: 0.75rem;
+            overflow-y: auto;
+        }
+        
+        .inspector-header {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .inspector-component {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .component-header {
+            background: #f0f7ff;
+            padding: 0.4rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #0078D7;
+            display: flex;
+            align-items: center;
+        }
+        
+        .component-icon {
+            margin-right: 0.5rem;
+        }
+        
+        .component-content {
+            padding: 0.4rem;
+        }
+        
+        .property-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+        }
+        
+        .property-label {
+            width: 100px;
+            color: #666;
+        }
+        
+        .property-field {
+            flex: 1;
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.75rem;
+        }
+        
+        .property-object {
+            flex: 1;
+            background: #f0f7ff;
+            border: 1px solid #0078D7;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.75rem;
+            color: #0078D7;
+            display: flex;
+            align-items: center;
+        }
+        
+        .property-object-icon {
+            margin-right: 0.25rem;
+            font-size: 0.7rem;
+        }
+        
+        .inspector-section {
+            display: none;
+        }
+        
+        .inspector-section.active {
+            display: block;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-cube mr-2"></i>
+                Part 4: Target Practice Game
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">ScoreManager Prefab</h1>
+            <p class="text-lg text-gray-600">Single Source of Truth for Score Management</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Prefab Concept -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-cube mr-2"></i>
+                    Why Use a Prefab?
+                </h3>
+                
+                <p class="text-sm mb-3">Create a ScoreManager prefab to maintain a single source of truth for score tracking across your game. This ensures consistent score management and simplifies UI reference assignment.</p>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
+                        <div class="feature-text">Single source of truth</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-link"></i></div>
+                        <div class="feature-text">Centralized UI refs</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-copy"></i></div>
+                        <div class="feature-text">Reusable across scenes</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-edit"></i></div>
+                        <div class="feature-text">Easy to update</div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-3">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Create GameObject</div>
+                            <div class="step-description">Add ScoreManager script</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Assign References</div>
+                            <div class="step-description">Link to TMP_Text</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Create Prefab</div>
+                            <div class="step-description">Drag to Project window</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Use in Targets</div>
+                            <div class="step-description">FindObjectOfType</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Prefab Visualization -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-project-diagram mr-2"></i>
+                    Prefab Structure
+                </h3>
+                
+                <div class="prefab-visualization">
+                    <div class="prefab-header">
+                        <div class="prefab-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <div class="prefab-title">ScoreManager.prefab</div>
+                    </div>
+                    
+                    <div class="prefab-content">
+                        <div class="prefab-hierarchy">
+                            <div class="hierarchy-item selected" data-target="scoreManager">
+                                <div class="hierarchy-icon">
+                                    <i class="fas fa-cube"></i>
+                                </div>
+                                <div class="hierarchy-label">ScoreManager</div>
+                            </div>
+                        </div>
+                        
+                        <div class="prefab-inspector">
+                            <div class="inspector-header">Inspector</div>
+                            
+                            <!-- ScoreManager GameObject Inspector -->
+                            <div class="inspector-section active" id="scoreManager-inspector">
+                                <div class="inspector-component">
+                                    <div class="component-header">
+                                        <i class="fas fa-file-code component-icon"></i>
+                                        Score Manager (Script)
+                                    </div>
+                                    <div class="component-content">
+                                        <div class="property-row">
+                                            <div class="property-label">Score Text</div>
+                                            <div class="property-object" id="scoreTextRef">
+                                                <i class="fas fa-font property-object-icon"></i>
+                                                ScoreText (TMP)
+                                            </div>
+                                        </div>
+                                        <div class="property-row">
+                                            <div class="property-label">Initial Score</div>
+                                            <div class="property-field">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg mt-3">
+                    <div class="font-semibold unity-blue">Best Practice:</div>
+                    <p class="text-sm">Use <code class="bg-white px-1 py-0.5 rounded">FindObjectOfType&lt;ScoreManager&gt;()</code> in Target scripts to reference the ScoreManager prefab instance in the scene. This avoids manual drag-and-drop references for each target.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive prefab visualization
+        const hierarchyItems = document.querySelectorAll('.hierarchy-item');
+        const inspectorSections = document.querySelectorAll('.inspector-section');
+        const scoreTextRef = document.getElementById('scoreTextRef');
+        
+        // Highlight reference on hover
+        scoreTextRef.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#d4e6f9';
+            this.style.boxShadow = '0 0 0 2px #0078D7';
+        });
+        
+        scoreTextRef.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '#f0f7ff';
+            this.style.boxShadow = 'none';
+        });
+        
+        // Switch between hierarchy items
+        hierarchyItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove selected class from all items
+                hierarchyItems.forEach(i => i.classList.remove('selected'));
+                
+                // Add selected class to clicked item
+                this.classList.add('selected');
+                
+                // Show corresponding inspector section
+                const targetId = this.getAttribute('data-target');
+                inspectorSections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === `${targetId}-inspector`) {
+                        section.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_31_hook_score_to_hits.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_33_target_prefab_fields.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_33_target_prefab_fields.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_31_hook_score_to_hits.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 36;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

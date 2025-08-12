@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Timer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow: auto;
+            max-height: 140px;
+        }
+        
+        .code-comment { color: #6A9955; }
+        .code-keyword { color: #569CD6; }
+        .code-string { color: #CE9178; }
+        .code-method { color: #DCDCAA; }
+        .code-type { color: #4EC9B0; }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .timer-visualization {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timer-display {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            width: 200px;
+        }
+        
+        .timer-value {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #0078D7;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timer-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5C2D91;
+            text-transform: uppercase;
+        }
+        
+        .timer-progress {
+            width: 80%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .timer-progress-bar {
+            height: 100%;
+            background: #0078D7;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        
+        .game-state {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: #0078D7;
+            display: none;
+        }
+        
+        .game-state.active {
+            display: block;
+            animation: pulse 1s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.05);
+            }
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-cube mr-2"></i>
+                Part 4: Target Practice Game
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Game Timer</h1>
+            <p class="text-lg text-gray-600">Adding Time Pressure to Your Game</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Timer Implementation -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-clock mr-2"></i>
+                    Timer Implementation
+                </h3>
+                
+                <p class="text-sm mb-2">Create a GameTimer script to add time pressure to your target practice game. This script manages the countdown and game state transitions.</p>
+                
+                <div class="code-block">
+<span class="code-keyword">using</span> UnityEngine;
+<span class="code-keyword">using</span> TMPro;
+<span class="code-keyword">using</span> System;
+
+<span class="code-keyword">public class</span> <span class="code-type">GameTimer</span> : MonoBehaviour
+{
+    <span class="code-comment">// Timer configuration</span>
+    [SerializeField] <span class="code-keyword">private float</span> gameDuration = 60f;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">TMP_Text</span> timerText;
+    
+    <span class="code-comment">// Game state</span>
+    <span class="code-keyword">private float</span> timeRemaining;
+    <span class="code-keyword">private bool</span> isGameActive = false;
+    
+    <span class="code-comment">// Events</span>
+    <span class="code-keyword">public event</span> <span class="code-type">Action</span> OnGameStart;
+    <span class="code-keyword">public event</span> <span class="code-type">Action</span> OnGameEnd;
+    
+    <span class="code-keyword">void</span> <span class="code-method">Start</span>()
+    {
+        <span class="code-comment">// Initialize timer</span>
+        timeRemaining = gameDuration;
+        <span class="code-method">UpdateTimerDisplay</span>();
+    }
+    
+    <span class="code-keyword">void</span> <span class="code-method">Update</span>()
+    {
+        <span class="code-keyword">if</span> (isGameActive)
+        {
+            <span class="code-keyword">if</span> (timeRemaining > 0)
+            {
+                <span class="code-comment">// Decrease timer</span>
+                timeRemaining -= Time.deltaTime;
+                <span class="code-method">UpdateTimerDisplay</span>();
+            }
+            <span class="code-keyword">else</span>
+            {
+                <span class="code-comment">// Time's up</span>
+                <span class="code-method">EndGame</span>();
+            }
+        }
+    }
+    
+    <span class="code-keyword">public void</span> <span class="code-method">StartGame</span>()
+    {
+        timeRemaining = gameDuration;
+        isGameActive = true;
+        OnGameStart?.Invoke();
+    }
+}
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Create Timer Script</div>
+                            <div class="step-description">With configurable duration</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Connect UI Text</div>
+                            <div class="step-description">TMP_Text reference</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Implement Events</div>
+                            <div class="step-description">Game start/end hooks</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Format Time Display</div>
+                            <div class="step-description">MM:SS format</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <p class="text-sm"><span class="font-semibold unity-blue">Key Method:</span> Use <code class="bg-white px-1 py-0.5 rounded">UpdateTimerDisplay()</code> to format time as minutes:seconds and update the UI text component.</p>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Visualization -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-stopwatch mr-2"></i>
+                    Timer Visualization
+                </h3>
+                
+                <div class="timer-visualization">
+                    <div class="timer-display">
+                        <div class="timer-value" id="timerValue">60</div>
+                        <div class="timer-label">Seconds</div>
+                    </div>
+                    
+                    <div class="timer-progress">
+                        <div class="timer-progress-bar" id="timerProgressBar"></div>
+                    </div>
+                    
+                    <div class="game-state" id="gameState">Game Over!</div>
+                </div>
+                
+                <div class="flex justify-center mt-3">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-3" id="startBtn">
+                        <i class="fas fa-play mr-1"></i> Start Timer
+                    </button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" id="resetBtn">
+                        <i class="fas fa-redo-alt mr-1"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <div class="font-semibold unity-blue">Game State Management:</div>
+                    <p class="text-sm">Use events to notify other game components when the timer starts or ends. This allows for coordinated game state transitions without direct references.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive timer visualization
+        const timerValue = document.getElementById('timerValue');
+        const timerProgressBar = document.getElementById('timerProgressBar');
+        const gameState = document.getElementById('gameState');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        const gameDuration = 60; // seconds
+        let timeRemaining = gameDuration;
+        let isGameActive = false;
+        let timerInterval;
+        
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update timer display
+        function updateTimerDisplay() {
+            timerValue.textContent = Math.ceil(timeRemaining);
+            const progress = (timeRemaining / gameDuration) * 100;
+            timerProgressBar.style.width = `${progress}%`;
+            
+            // Change color as time runs out
+            if (timeRemaining <= 10) {
+                timerValue.style.color = '#dc3545';
+            } else {
+                timerValue.style.color = '#0078D7';
+            }
+        }
+        
+        // Start game timer
+        function startGame() {
+            if (isGameActive) return;
+            
+            timeRemaining = gameDuration;
+            isGameActive = true;
+            gameState.classList.remove('active');
+            startBtn.disabled = true;
+            startBtn.classList.add('opacity-50');
+            
+            // Update timer every 100ms
+            timerInterval = setInterval(() => {
+                if (timeRemaining > 0) {
+                    timeRemaining -= 0.1;
+                    updateTimerDisplay();
+                } else {
+                    endGame();
+                }
+            }, 100);
+        }
+        
+        // End game
+        function endGame() {
+            isGameActive = false;
+            clearInterval(timerInterval);
+            timeRemaining = 0;
+            updateTimerDisplay();
+            
+            // Show game over state
+            gameState.textContent = 'Game Over!';
+            gameState.classList.add('active');
+            
+            // Enable start button
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50');
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isGameActive = false;
+            timeRemaining = gameDuration;
+            updateTimerDisplay();
+            gameState.classList.remove('active');
+            
+            // Enable start button
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50');
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', resetTimer);
+        
+        // Initialize display
+        updateTimerDisplay();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_34_target_spawning.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_36_game_manager.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_36_game_manager.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_34_target_spawning.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 39;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

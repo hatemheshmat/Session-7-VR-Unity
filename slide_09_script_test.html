@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Attach & Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .step-container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 200px;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .step-circle.active {
+            background: #0078D7;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step-line {
+            flex: 1;
+            height: 3px;
+            background: #e9ecef;
+            margin-top: 20px;
+        }
+        
+        .step-line.active {
+            background: #0078D7;
+        }
+        
+        .step-content {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            min-height: 250px;
+            position: relative;
+        }
+        
+        .step-panel {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .step-panel.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .inspector-panel {
+            background: #383838;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #e2e8f0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .inspector-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #555;
+            margin-bottom: 0.5rem;
+        }
+        
+        .inspector-section {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: #444;
+            border-radius: 4px;
+        }
+        
+        .inspector-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.25rem 0;
+        }
+        
+        .console-panel {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #e2e8f0;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .console-line {
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+        
+        .console-icon {
+            margin-right: 0.5rem;
+        }
+        
+        .console-log {
+            color: #ffffff;
+        }
+        
+        .console-warning {
+            color: #ffc107;
+        }
+        
+        .console-error {
+            color: #dc3545;
+        }
+        
+        .console-time {
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        .add-component-btn {
+            background: #0078D7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-component-btn:hover {
+            background: #005fa3;
+        }
+        
+        .play-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .play-btn:hover {
+            background: #388E3C;
+        }
+        
+        .play-btn.playing {
+            background: #F44336;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-2 text-center mx-auto">Script Attach & Test</h1>
+            <p class="text-lg text-gray-600">Adding Components and Watching Console Output</p>
+        </div>
+        
+        <!-- Step Indicator -->
+        <div class="step-container mb-4">
+            <div class="step-indicator">
+                <div class="step-circle active" data-step="1">1</div>
+                <div class="text-center text-sm">Create Script</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-indicator">
+                <div class="step-circle" data-step="2">2</div>
+                <div class="text-center text-sm">Attach to GameObject</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-indicator">
+                <div class="step-circle" data-step="3">3</div>
+                <div class="text-center text-sm">Press Play</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-indicator">
+                <div class="step-circle" data-step="4">4</div>
+                <div class="text-center text-sm">Check Console</div>
+            </div>
+        </div>
+        
+        <!-- Step Content -->
+        <div class="step-content w-full max-w-4xl">
+            <!-- Step 1: Create Script -->
+            <div class="step-panel active" id="step1">
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">Step 1: Create Script</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="mb-3">Create a new C# script in your project:</p>
+                        <ol class="list-decimal list-inside space-y-2 ml-4">
+                            <li>Right-click in Project window</li>
+                            <li>Select <strong>Create → C# Script</strong></li>
+                            <li>Name it <strong>ScoreDemo</strong></li>
+                            <li>Double-click to open in editor</li>
+                        </ol>
+                    </div>
+                    <div class="console-panel">
+                        <div class="text-sm text-gray-400 mb-2">// ScoreDemo.cs</div>
+                        <pre><code><span class="text-blue-400">using</span> UnityEngine;
+
+<span class="text-blue-400">public class</span> <span class="text-green-400">ScoreDemo</span> : MonoBehaviour
+{
+    <span class="text-blue-400">public int</span> score = 0;
+    
+    <span class="text-blue-400">void</span> <span class="text-yellow-400">Start</span>()
+    {
+        Debug.Log(<span class="text-orange-400">"Score: "</span> + score);
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Attach to GameObject -->
+            <div class="step-panel" id="step2">
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">Step 2: Attach to GameObject</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="mb-3">Attach the script to a GameObject:</p>
+                        <ol class="list-decimal list-inside space-y-2 ml-4">
+                            <li>Select a GameObject in Hierarchy</li>
+                            <li>In Inspector, click <strong>Add Component</strong></li>
+                            <li>Type "ScoreDemo" and select it</li>
+                            <li>The script is now attached as a component</li>
+                        </ol>
+                    </div>
+                    <div class="inspector-panel">
+                        <div class="inspector-header">
+                            <i class="fas fa-cube mr-2"></i>
+                            <span>Player</span>
+                        </div>
+                        <div class="inspector-section">
+                            <div class="text-sm font-semibold mb-1">Transform</div>
+                            <div class="inspector-field">
+                                <span>Position</span>
+                                <span>X: 0 Y: 0 Z: 0</span>
+                            </div>
+                        </div>
+                        <div class="inspector-section">
+                            <div class="text-sm font-semibold mb-1">ScoreDemo (Script)</div>
+                            <div class="inspector-field">
+                                <span>Score</span>
+                                <span>0</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-center">
+                            <button class="add-component-btn">
+                                <i class="fas fa-plus mr-1"></i> Add Component
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Press Play -->
+            <div class="step-panel" id="step3">
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">Step 3: Press Play</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="mb-3">Test your script in Play Mode:</p>
+                        <ol class="list-decimal list-inside space-y-2 ml-4">
+                            <li>Click the Play button at the top of the editor</li>
+                            <li>Unity enters Play Mode</li>
+                            <li>The Start() method runs automatically</li>
+                            <li>Debug.Log() sends message to Console</li>
+                        </ol>
+                        <div class="mt-4 flex justify-center">
+                            <button id="playButton" class="play-btn">
+                                <i class="fas fa-play mr-2"></i> Press Play
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <div class="w-full h-40 bg-gray-800 rounded-lg flex items-center justify-center relative">
+                            <div class="absolute top-2 left-2 flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div id="playModeIndicator" class="text-white text-center">
+                                <i class="fas fa-gamepad text-4xl mb-2"></i>
+                                <div>Editor Mode</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Check Console -->
+            <div class="step-panel" id="step4">
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">Step 4: Check Console</h3>
+                <div class="console-panel">
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-700 pb-2">
+                        <div class="flex space-x-3">
+                            <span class="text-white">Console</span>
+                            <span class="text-gray-400">Timeline</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <i class="fas fa-search text-gray-400"></i>
+                            <i class="fas fa-filter text-gray-400"></i>
+                            <i class="fas fa-trash text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div id="consoleOutput">
+                        <div class="console-line">
+                            <span class="console-time">0:00</span>
+                            <i class="fas fa-info-circle console-icon text-white"></i>
+                            <span class="console-log">Score: 0</span>
+                            <span class="text-gray-500 ml-2">ScoreDemo:9</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h4 class="font-semibold mb-2">Debug Messages:</h4>
+                    <div class="grid grid-cols-3 gap-3 text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            <span><code>Debug.Log()</code> - Information</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                            <span><code>Debug.LogWarning()</code> - Warning</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                            <span><code>Debug.LogError()</code> - Error</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Best Practices -->
+        <div class="w-full max-w-4xl mt-4">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
+                <h4 class="font-semibold unity-blue mb-2">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Best Practices
+                </h4>
+                <ul class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use descriptive Debug.Log messages</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Remove debug logs before final build</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Test scripts in isolation first</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Check for errors in Console window</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Step navigation
+        const stepCircles = document.querySelectorAll('.step-circle');
+        const stepPanels = document.querySelectorAll('.step-panel');
+        const stepLines = document.querySelectorAll('.step-line');
+        
+        stepCircles.forEach(circle => {
+            circle.addEventListener('click', function() {
+                const step = this.getAttribute('data-step');
+                
+                // Update circles
+                stepCircles.forEach(c => c.classList.remove('active'));
+                for (let i = 0; i < step; i++) {
+                    stepCircles[i].classList.add('active');
+                }
+                
+                // Update lines
+                stepLines.forEach(line => line.classList.remove('active'));
+                for (let i = 0; i < step - 1; i++) {
+                    stepLines[i].classList.add('active');
+                }
+                
+                // Show correct panel
+                stepPanels.forEach(panel => panel.classList.remove('active'));
+                document.getElementById(`step${step}`).classList.add('active');
+            });
+        });
+        
+        // Play button functionality
+        const playButton = document.getElementById('playButton');
+        const playModeIndicator = document.getElementById('playModeIndicator');
+        const consoleOutput = document.getElementById('consoleOutput');
+        
+        let isPlaying = false;
+        
+        playButton.addEventListener('click', function() {
+            isPlaying = !isPlaying;
+            
+            if (isPlaying) {
+                playButton.classList.add('playing');
+                playButton.innerHTML = '<i class="fas fa-stop mr-2"></i> Stop';
+                playModeIndicator.innerHTML = '<i class="fas fa-play-circle text-4xl mb-2 text-green-500"></i><div class="text-green-400">Play Mode</div>';
+                
+                // Automatically advance to step 4 after a short delay
+                setTimeout(() => {
+                    document.querySelector('.step-circle[data-step="4"]').click();
+                }, 1000);
+            } else {
+                playButton.classList.remove('playing');
+                playButton.innerHTML = '<i class="fas fa-play mr-2"></i> Press Play';
+                playModeIndicator.innerHTML = '<i class="fas fa-gamepad text-4xl mb-2"></i><div>Editor Mode</div>';
+            }
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_08_inspector.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_10_variables_quiz.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_10_variables_quiz.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_08_inspector.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 11;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

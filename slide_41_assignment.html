@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 7: Assignment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/responsive-slides-fixed.css">
+    <link rel="stylesheet" href="css/responsive-footer-fixed.css">
+    <link rel="stylesheet" href="css/notes-panel-fixed.css">
+    <link rel="stylesheet" href="css/dark-theme.css">
+    <link rel="stylesheet" href="css/consistent-styles.css">
+    <style>
+        .assignment-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 15px;
+            min-height: 500px;
+        }
+        
+        body.dark-theme .assignment-container {
+            background-color: rgba(45, 45, 45, 0.9);
+        }
+        
+        .assignment-header {
+            text-align: center;
+            margin-bottom: 15px;
+            grid-column: 1 / -1;
+        }
+        
+        .assignment-header h2 {
+            color: #0078D7;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        body.dark-theme .assignment-header h2 {
+            color: #3a9fff;
+        }
+        
+        .assignment-header p {
+            color: #5C2D91;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        body.dark-theme .assignment-header p {
+            color: #9b6ad9;
+        }
+        
+        .assignment-section {
+            margin-bottom: 15px;
+        }
+        
+        .assignment-section.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .assignment-section h3 {
+            color: #0078D7;
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+            border-bottom: 2px solid #0078D7;
+            padding-bottom: 5px;
+        }
+        
+        body.dark-theme .assignment-section h3 {
+            color: #3a9fff;
+            border-bottom-color: #3a9fff;
+        }
+        
+        .task-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 5px;
+        }
+        
+        .task-item {
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        
+        .task-item:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #5C2D91;
+            font-weight: bold;
+        }
+        
+        body.dark-theme .task-item:before {
+            color: #9b6ad9;
+        }
+        
+        .requirements {
+            background-color: #f0f7ff;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #0078D7;
+        }
+        
+        body.dark-theme .requirements {
+            background-color: #1a2733;
+            border-left-color: #3a9fff;
+        }
+        
+        .requirements h4 {
+            margin: 0 0 5px 0;
+            color: #0078D7;
+            font-size: 1rem;
+        }
+        
+        body.dark-theme .requirements h4 {
+            color: #3a9fff;
+        }
+        
+        .requirements ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .requirements li {
+            margin-bottom: 3px;
+        }
+        
+        .submission {
+            background-color: #f5f0ff;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #5C2D91;
+        }
+        
+        body.dark-theme .submission {
+            background-color: #231a33;
+            border-left-color: #9b6ad9;
+        }
+        
+        .submission h4 {
+            margin: 0 0 5px 0;
+            color: #5C2D91;
+            font-size: 1rem;
+        }
+        
+        body.dark-theme .submission h4 {
+            color: #9b6ad9;
+        }
+        
+        .submission p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .submission ul {
+            margin: 5px 0;
+            padding-left: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .submission li {
+            margin-bottom: 3px;
+        }
+        
+        .deadline {
+            font-weight: bold;
+            color: #dc3545;
+        }
+        
+        body.dark-theme .deadline {
+            color: #f27685;
+        }
+        
+        .resources {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 10px;
+            margin-top: 0;
+        }
+        
+        .resource-card {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark-theme .resource-card {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+        
+        .resource-card h5 {
+            margin: 0 0 5px 0;
+            color: #0078D7;
+            font-size: 0.95rem;
+        }
+        
+        body.dark-theme .resource-card h5 {
+            color: #3a9fff;
+        }
+        
+        .resource-card p {
+            margin: 0 0 5px 0;
+            font-size: 0.8rem;
+        }
+        
+        .resource-link {
+            display: inline-block;
+            color: #5C2D91;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+        
+        body.dark-theme .resource-link {
+            color: #9b6ad9;
+        }
+        
+        .slide-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        
+        p {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="section-indicator">Session 7: C# Scripting & UI in VR</div>
+        </div>
+        
+        <div class="slide-content">
+            <div class="assignment-container">
+                <div class="assignment-header">
+                    <h2>Session 7 Assignment</h2>
+                    <p>Target Practice Game with Score Display</p>
+                </div>
+                
+                <div class="assignment-section">
+                    <h3>Project Overview</h3>
+                    <p>Create a target practice game in VR that combines C# scripting and UI elements. Players will shoot targets with ray interactors and see their score on a world-space canvas.</p>
+                </div>
+                
+                <div class="assignment-section">
+                    <h3>Requirements</h3>
+                    <div class="requirements">
+                        <h4>Technical Requirements</h4>
+                        <ul>
+                            <li>Unity 6 with Meta XR All-in-One SDK</li>
+                            <li>Proper C# scripting practices</li>
+                            <li>TextMeshPro for all UI text elements</li>
+                            <li>World-space canvas for UI elements</li>
+                            <li>3+ target types with different point values</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="assignment-section full-width">
+                    <h3>Tasks</h3>
+                    <ul class="task-list">
+                        <li class="task-item">Create a VR scene with room and skybox</li>
+                        <li class="task-item">Set up XR Ray Interactors on controllers</li>
+                        <li class="task-item">Create target prefabs with point values</li>
+                        <li class="task-item">Implement target spawning system</li>
+                        <li class="task-item">Create world-space canvas with score</li>
+                        <li class="task-item">Implement ScoreManager script</li>
+                        <li class="task-item">Add timer system with countdown</li>
+                        <li class="task-item">Create game state management</li>
+                        <li class="task-item">Add visual/audio feedback for hits</li>
+                    </ul>
+                </div>
+                
+                <div class="assignment-section">
+                    <h3>Submission</h3>
+                    <div class="submission">
+                        <h4>Submission Guidelines</h4>
+                        <p>Submit as .zip with all project files, README.md, and demo video (30-60s)</p>
+                        <p>Due: <span class="deadline">August 18, 2025 at 11:59 PM</span></p>
+                    </div>
+                </div>
+                
+                <div class="assignment-section">
+                    <h3>Resources</h3>
+                    <div class="resources">
+                        <div class="resource-card">
+                            <h5>Unity Documentation</h5>
+                            <p>XR Interaction Toolkit docs</p>
+                            <a href="#" class="resource-link">View Docs →</a>
+                        </div>
+                        <div class="resource-card">
+                            <h5>Meta Quest Developer Hub</h5>
+                            <p>Tools for Meta Quest development</p>
+                            <a href="#" class="resource-link">View Resources →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Responsive Footer -->
+    <div class="responsive-footer">
+        <div class="footer-left">
+            <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+            <span class="slide-counter">41 / 45</span>
+        </div>
+        <div class="footer-center">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 91%;"></div>
+            </div>
+        </div>
+        <div class="footer-right">
+            <button id="firstSlideBtn" title="First Slide"><i class="fas fa-step-backward"></i></button>
+            <button id="prevSlideBtn" title="Previous Slide"><i class="fas fa-chevron-left"></i></button>
+            <button id="nextSlideBtn" title="Next Slide"><i class="fas fa-chevron-right"></i></button>
+            <button id="lastSlideBtn" title="Last Slide"><i class="fas fa-step-forward"></i></button>
+            <button id="themeToggleBtn" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+            <button id="notesBtn" title="Slide Notes"><i class="fas fa-sticky-note"></i></button>
+            <button id="fullscreenBtn" title="Toggle Fullscreen"><i class="fas fa-expand"></i></button>
+            <button id="menuBtn" title="Menu"><i class="fas fa-bars"></i></button>
+        </div>
+    </div>
+    
+    <script src="js/responsive-footer-fixed.js"></script>
+    <script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

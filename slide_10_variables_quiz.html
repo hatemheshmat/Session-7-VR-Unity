@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-Quiz: Variables</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .quiz-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .question-card.active {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .question-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: #0078D7;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            background: #e9ecef;
+            border: 2px solid transparent;
+            text-align: left;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .option-btn:hover {
+            background: #dee2e6;
+        }
+        
+        .option-btn.selected {
+            border-color: #0078D7;
+            background: #e3f2fd;
+        }
+        
+        .option-btn.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .option-btn.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .feedback-icon {
+            margin-left: 0.5rem;
+        }
+        
+        .quiz-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .prev-btn {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .next-btn {
+            background: #0078D7;
+            color: white;
+        }
+        
+        .submit-btn {
+            background: #5C2D91;
+            color: white;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .prev-btn:hover {
+            background: #dee2e6;
+        }
+        
+        .next-btn:hover {
+            background: #0069c0;
+        }
+        
+        .submit-btn:hover {
+            background: #4b2474;
+        }
+        
+        .results-container {
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .score-display {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #0078D7;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .code-snippet {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .number { color: #b5cea8; }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+<link rel="stylesheet" href="css/quiz-fixed.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-2 text-center mx-auto">Mini-Quiz: Variables</h1>
+            <p class="text-lg text-gray-600">Test your knowledge of variable types and naming</p>
+        </div>
+        
+        <!-- Quiz Container -->
+        <div class="quiz-container w-full">
+            <!-- Question 1 -->
+            <div class="question-card active" id="question1">
+                <h3 class="text-lg font-semibold mb-3 text-center mx-auto">
+                    <span class="question-number">1</span>
+                    Which variable type would be best for storing a player's health percentage?
+                </h3>
+                <div class="options-container">
+                    <button class="option-btn" data-correct="false">
+                        <code class="keyword">int</code> playerHealth = 75;
+                    </button>
+                    <button class="option-btn correct" data-correct="true">
+                        <code class="keyword">float</code> playerHealth = 75.5f;
+                    </button>
+                    <button class="option-btn" data-correct="false">
+                        <code class="keyword">string</code> playerHealth = "75.5";
+                    </button>
+                    <button class="option-btn" data-correct="false">
+                        <code class="keyword">bool</code> playerHealth = true;
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Question 2 -->
+            <div class="question-card hidden" id="question2">
+                <h3 class="text-lg font-semibold mb-3 text-center mx-auto">
+                    <span class="question-number">2</span>
+                    Which of these is a valid variable name in C#?
+                </h3>
+                <div class="options-container">
+                    <button class="option-btn" data-correct="false">
+                        <code>1stPlayer</code>
+                    </button>
+                    <button class="option-btn" data-correct="false">
+                        <code>player-score</code>
+                    </button>
+                    <button class="option-btn correct" data-correct="true">
+                        <code>_playerScore</code>
+                    </button>
+                    <button class="option-btn" data-correct="false">
+                        <code>player score</code>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Question 3 -->
+            <div class="question-card hidden" id="question3">
+                <h3 class="text-lg font-semibold mb-3 text-center mx-auto">
+                    <span class="question-number">3</span>
+                    Which statement about variables is correct?
+                </h3>
+                <div class="code-snippet">
+<span class="keyword">public class</span> PlayerController : MonoBehaviour
+{
+    <span class="keyword">public int</span> score = 0;
+    
+    <span class="keyword">void</span> AddPoints(<span class="keyword">int</span> amount)
+    {
+        <span class="keyword">int</span> bonus = 5;
+        score += amount + bonus;
+    }
+}
+                </div>
+                <div class="options-container mt-3">
+                    <button class="option-btn" data-correct="false">
+                        <code>bonus</code> is accessible from other methods in the class
+                    </button>
+                    <button class="option-btn" data-correct="false">
+                        <code>amount</code> is a field variable
+                    </button>
+                    <button class="option-btn" data-correct="false">
+                        <code>score</code> is a local variable
+                    </button>
+                    <button class="option-btn correct" data-correct="true">
+                        <code>score</code> will be visible in the Unity Inspector
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results (initially hidden) -->
+            <div class="results-container hidden" id="results">
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">Quiz Results</h3>
+                <div class="score-display">
+                    <span id="score">0</span>/3
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div id="feedback" class="mt-3"></div>
+                <button id="restartBtn" class="nav-btn next-btn mt-4">
+                    <i class="fas fa-redo mr-2"></i>
+                    Try Again
+                </button>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="quiz-navigation" id="quizNav">
+                <button id="prevBtn" class="nav-btn prev-btn" disabled>
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Previous
+                </button>
+                <div>
+                    <span id="currentQuestion">1</span>/3
+                </div>
+                <button id="nextBtn" class="nav-btn next-btn">
+                    Next
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Key Points -->
+        <div class="w-full max-w-4xl mt-4">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
+                <h4 class="font-semibold unity-blue mb-2">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Remember These Key Points
+                </h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Choose the right type for your data (int, float, bool, string)</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Variable names can't start with numbers or contain spaces</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Public fields appear in the Inspector for easy tuning</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Local variables only exist within their method scope</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Quiz functionality
+        const questions = document.querySelectorAll('.question-card');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentQuestionSpan = document.getElementById('currentQuestion');
+        const quizNav = document.getElementById('quizNav');
+        const results = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score');
+        const progressFill = document.getElementById('progressFill');
+        const feedback = document.getElementById('feedback');
+        const restartBtn = document.getElementById('restartBtn');
+        
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = [false, false, false];
+        
+        // Initialize option buttons
+        document.querySelectorAll('.option-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const questionIndex = parseInt(this.closest('.question-card').id.replace('question', '')) - 1;
+                
+                // Only allow selection if not already answered
+                if (!answered[questionIndex]) {
+                    // Remove selected class from all options in this question
+                    const options = this.closest('.options-container').querySelectorAll('.option-btn');
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                }
+            });
+        });
+        
+        // Navigation functions
+        function showQuestion(index) {
+            questions.forEach((q, i) => {
+                if (i === index) {
+                    q.classList.remove('hidden');
+                    q.classList.add('active');
+                } else {
+                    q.classList.add('hidden');
+                    q.classList.remove('active');
+                }
+            });
+            
+            currentQuestionIndex = index;
+            currentQuestionSpan.textContent = index + 1;
+            
+            // Update button states
+            prevBtn.disabled = index === 0;
+            
+            if (index === questions.length - 1) {
+                nextBtn.textContent = 'Submit';
+                nextBtn.classList.remove('next-btn');
+                nextBtn.classList.add('submit-btn');
+            } else {
+                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right ml-2"></i>';
+                nextBtn.classList.add('next-btn');
+                nextBtn.classList.remove('submit-btn');
+            }
+        }
+        
+        function checkAnswer(questionIndex) {
+            if (answered[questionIndex]) return;
+            
+            const questionCard = document.getElementById(`question${questionIndex + 1}`);
+            const selectedOption = questionCard.querySelector('.option-btn.selected');
+            
+            if (!selectedOption) return;
+            
+            const isCorrect = selectedOption.getAttribute('data-correct') === 'true';
+            
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                selectedOption.innerHTML += '<i class="fas fa-check feedback-icon text-green-500"></i>';
+                score++;
+            } else {
+                selectedOption.classList.add('incorrect');
+                selectedOption.innerHTML += '<i class="fas fa-times feedback-icon text-red-500"></i>';
+                
+                // Show the correct answer
+                questionCard.querySelectorAll('.option-btn').forEach(opt => {
+                    if (opt.getAttribute('data-correct') === 'true') {
+                        opt.classList.add('correct');
+                        opt.innerHTML += '<i class="fas fa-check feedback-icon text-green-500"></i>';
+                    }
+                });
+            }
+            
+            answered[questionIndex] = true;
+        }
+        
+        function showResults() {
+            questions.forEach(q => q.classList.add('hidden'));
+            results.classList.remove('hidden');
+            quizNav.classList.add('hidden');
+            
+            scoreDisplay.textContent = score;
+            progressFill.style.width = `${(score / 3) * 100}%`;
+            
+            // Set feedback based on score
+            if (score === 3) {
+                feedback.innerHTML = '<span class="text-green-500 font-semibold">Perfect! You\'ve mastered C# variables!</span>';
+            } else if (score === 2) {
+                feedback.innerHTML = '<span class="text-blue-500 font-semibold">Good job! Just one more concept to review.</span>';
+            } else {
+                feedback.innerHTML = '<span class="text-orange-500 font-semibold">Keep practicing! Review the variable concepts again.</span>';
+            }
+        }
+        
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answered = [false, false, false];
+            
+            // Reset all options
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect');
+                btn.innerHTML = btn.innerHTML.replace(/<i class="fas fa-.*?"><\/i>/, '');
+            });
+            
+            // Show first question
+            results.classList.add('hidden');
+            quizNav.classList.remove('hidden');
+            showQuestion(0);
+        }
+        
+        // Event listeners
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                showQuestion(currentQuestionIndex - 1);
+            }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            // Check current question's answer
+            checkAnswer(currentQuestionIndex);
+            
+            // If it's the last question and Submit button is clicked
+            if (currentQuestionIndex === questions.length - 1 && nextBtn.textContent.trim() === 'Submit') {
+                showResults();
+                return;
+            }
+            
+            // Otherwise go to next question
+            if (currentQuestionIndex < questions.length - 1) {
+                showQuestion(currentQuestionIndex + 1);
+            }
+        });
+        
+        restartBtn.addEventListener('click', resetQuiz);
+        
+        // Initialize
+        showQuestion(0);
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_09_script_test.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_11_methods.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_11_methods.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_09_script_test.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 12;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+<script src="js/quiz-fixed.js"></script>
+</body>
+</html>
+

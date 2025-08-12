@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add TextMeshPro Package</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .text-comparison {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .text-sample {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .text-sample-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .standard-text {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        
+        .tmp-text {
+            font-family: Arial, sans-serif;
+            color: #333;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-tv mr-2"></i>
+                Part 3: UI & Score Canvas
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Add TextMeshPro Package</h1>
+            <p class="text-lg text-gray-600">High-Quality Text Rendering for Unity UI</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: TextMeshPro Overview -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-font mr-2"></i>
+                    TextMeshPro Overview
+                </h3>
+                
+                <p class="text-sm mb-3">TextMeshPro (TMP) is Unity's advanced text rendering system that replaces the standard UI Text component with improved quality and features.</p>
+                
+                <div class="text-comparison">
+                    <div class="text-sample bg-gray-100">
+                        <div class="text-sample-title unity-blue">Standard Text</div>
+                        <div class="standard-text text-2xl">Score: 100</div>
+                    </div>
+                    <div class="text-sample bg-gray-100">
+                        <div class="text-sample-title meta-purple">TextMeshPro</div>
+                        <div class="tmp-text text-2xl font-semibold" id="tmpText">Score: 100</div>
+                    </div>
+                </div>
+                
+                <h4 class="font-semibold unity-blue mb-1">Key Benefits</h4>
+                
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-check"></i></div>
+                    <div class="feature-text">Crisp text at any size and resolution</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-check"></i></div>
+                    <div class="feature-text">Rich text formatting and styling</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-check"></i></div>
+                    <div class="feature-text">Advanced effects (shadows, outlines, etc.)</div>
+                </div>
+            </div>
+            
+            <!-- Right: Installation Steps -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-download mr-2"></i>
+                    Installation Steps
+                </h3>
+                
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Open Package Manager</div>
+                        <div class="step-description">Window → Package Manager</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Find TextMeshPro</div>
+                        <div class="step-description">Search for "TextMeshPro" in the package list</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Install Package</div>
+                        <div class="step-description">Click "Install" button to add TMP to your project</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Import TMP Essentials</div>
+                        <div class="step-description">When prompted, click "Import TMP Essentials"</div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg mt-3">
+                    <div class="font-semibold unity-blue mb-1">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Available Components
+                    </div>
+                    <div class="text-sm">
+                        <span class="font-semibold">TextMeshProUGUI:</span> For Canvas UI elements<br>
+                        <span class="font-semibold">TextMeshPro:</span> For 3D world text objects
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Animate TMP text to show effects
+        const tmpText = document.getElementById('tmpText');
+        let hue = 0;
+        
+        function animateTMPText() {
+            hue = (hue + 1) % 360;
+            
+            // Apply various TMP-like effects
+            tmpText.style.textShadow = `0 2px 4px rgba(0,0,0,0.2), 0 0 5px rgba(${Math.sin(hue/180*Math.PI)*50+200}, ${Math.sin((hue+120)/180*Math.PI)*50+200}, ${Math.sin((hue+240)/180*Math.PI)*50+200}, 0.3)`;
+            
+            requestAnimationFrame(animateTMPText);
+        }
+        
+        animateTMPText();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_22_create_worldspace_canvas.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_24_add_tmp_text.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_24_add_tmp_text.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_22_create_worldspace_canvas.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 26;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

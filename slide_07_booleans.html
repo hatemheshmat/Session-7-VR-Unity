@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booleans</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+        
+        .code-snippet {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        
+        .boolean-simulator {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1rem;
+            margin: 0 auto;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #0078D7;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .result-box {
+            background: #1e1e1e;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-top: 0.75rem;
+            min-height: 90px;
+        }
+        
+        .result-line {
+            margin: 0.25rem 0;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+        
+        .result-line.highlight {
+            background: rgba(0, 120, 215, 0.2);
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-3">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Booleans</h1>
+            <p class="text-lg text-gray-600">True/False Flags and Conditional Logic</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4 w-full max-w-5xl">
+            <!-- Left: Boolean Explanation -->
+            <div>
+                <h3 class="text-xl font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-toggle-on mr-2"></i>
+                    Boolean Basics
+                </h3>
+                
+                <ul class="space-y-2 mb-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <div>
+                            <strong>Only two values:</strong> 
+                            <span class="bg-green-100 px-1 rounded">true</span> or 
+                            <span class="bg-red-100 px-1 rounded">false</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <div>
+                            <strong>Perfect for flags:</strong> Track states like "isJumping", "isGameOver"
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <div>
+                            <strong>Used in conditions:</strong> if statements, while loops
+                        </div>
+                    </li>
+                </ul>
+                
+                <div class="code-snippet">
+<span class="keyword">public class</span> <span class="type">PlayerController</span> : <span class="type">MonoBehaviour</span>
+{
+    <span class="keyword">public bool</span> isGrounded = <span class="keyword">true</span>;
+    <span class="keyword">public bool</span> hasKey = <span class="keyword">false</span>;
+    
+    <span class="keyword">void</span> <span class="method">Update</span>()
+    {
+        <span class="comment">// Boolean in if statement</span>
+        <span class="keyword">if</span> (isGrounded && <span class="type">Input</span>.<span class="method">GetButtonDown</span>(<span class="string">"Jump"</span>))
+        {
+            <span class="method">Jump</span>();
+            isGrounded = <span class="keyword">false</span>;
+        }
+    }
+}
+                </div>
+                
+                <!-- Boolean Operators -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-3">
+                    <h4 class="font-semibold unity-blue mb-1">
+                        <i class="fas fa-code-branch mr-1"></i>
+                        Boolean Operators
+                    </h4>
+                    <div class="grid grid-cols-4 gap-2 text-sm">
+                        <div>
+                            <strong>&&</strong> (AND): Both true
+                        </div>
+                        <div>
+                            <strong>||</strong> (OR): Either true
+                        </div>
+                        <div>
+                            <strong>!</strong> (NOT): Inverts value
+                        </div>
+                        <div>
+                            <strong>==</strong> / <strong>!=</strong>: Equality check
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Boolean Simulator -->
+            <div>
+                <h3 class="text-xl font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-gamepad mr-2"></i>
+                    Interactive Boolean Logic
+                </h3>
+                
+                <div class="boolean-simulator">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">isGrounded:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="isGrounded" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">hasKey:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="hasKey">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">pressJump:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="pressJump">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">nearDoor:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="nearDoor">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="result-box">
+                        <div class="result-line" id="line1">if (isGrounded && pressJump)</div>
+                        <div class="result-line" id="line2">{</div>
+                        <div class="result-line" id="line3">    Jump(); // Player jumps!</div>
+                        <div class="result-line" id="line4">    isGrounded = false;</div>
+                        <div class="result-line" id="line5">}</div>
+                        <div class="result-line" id="line6">if (hasKey && nearDoor)</div>
+                        <div class="result-line" id="line7">{</div>
+                        <div class="result-line" id="line8">    UnlockDoor(); // Door unlocks!</div>
+                        <div class="result-line" id="line9">}</div>
+                    </div>
+                    
+                    <div class="mt-2 text-center text-sm text-gray-600">
+                        Toggle the switches to see how boolean logic affects game behavior
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Add interactivity to boolean simulator
+        const isGroundedCheckbox = document.getElementById('isGrounded');
+        const hasKeyCheckbox = document.getElementById('hasKey');
+        const pressJumpCheckbox = document.getElementById('pressJump');
+        const nearDoorCheckbox = document.getElementById('nearDoor');
+        
+        const line1 = document.getElementById('line1');
+        const line3 = document.getElementById('line3');
+        const line4 = document.getElementById('line4');
+        const line6 = document.getElementById('line6');
+        const line8 = document.getElementById('line8');
+        
+        function updateLogic() {
+            // Reset all highlights
+            document.querySelectorAll('.result-line').forEach(line => {
+                line.classList.remove('highlight');
+            });
+            
+            // Update jump logic
+            const isGrounded = isGroundedCheckbox.checked;
+            const pressJump = pressJumpCheckbox.checked;
+            
+            line1.textContent = `if (isGrounded(${isGrounded}) && pressJump(${pressJump}))`;
+            
+            if (isGrounded && pressJump) {
+                line1.classList.add('highlight');
+                line3.classList.add('highlight');
+                line4.classList.add('highlight');
+            }
+            
+            // Update door logic
+            const hasKey = hasKeyCheckbox.checked;
+            const nearDoor = nearDoorCheckbox.checked;
+            
+            line6.textContent = `if (hasKey(${hasKey}) && nearDoor(${nearDoor}))`;
+            
+            if (hasKey && nearDoor) {
+                line6.classList.add('highlight');
+                line8.classList.add('highlight');
+            }
+        }
+        
+        // Add event listeners
+        isGroundedCheckbox.addEventListener('change', updateLogic);
+        hasKeyCheckbox.addEventListener('change', updateLogic);
+        pressJumpCheckbox.addEventListener('change', updateLogic);
+        nearDoorCheckbox.addEventListener('change', updateLogic);
+        
+        // Initialize
+        updateLogic();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_06_strings.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_08_inspector.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_08_inspector.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_06_strings.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 9;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

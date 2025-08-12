@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game UI Panels</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow: auto;
+            max-height: 120px;
+        }
+        
+        .code-comment { color: #6A9955; }
+        .code-keyword { color: #569CD6; }
+        .code-string { color: #CE9178; }
+        .code-method { color: #DCDCAA; }
+        .code-type { color: #4EC9B0; }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .ui-visualization {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+        
+        .ui-panel {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            opacity: 0;
+            transform: translateZ(-100px) rotateX(90deg);
+            padding: 1rem;
+        }
+        
+        .ui-panel.active {
+            opacity: 1;
+            transform: translateZ(0) rotateX(0);
+        }
+        
+        .panel-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #0078D7;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .panel-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .panel-button {
+            background: #0078D7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 150px;
+        }
+        
+        .panel-button:hover {
+            background: #005ea3;
+        }
+        
+        .panel-button i {
+            margin-right: 0.5rem;
+        }
+        
+        .score-display {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #5C2D91;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timer-display {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0078D7;
+            margin-bottom: 1rem;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-cube mr-2"></i>
+                Part 4: Target Practice Game
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Game UI Panels</h1>
+            <p class="text-lg text-gray-600">Creating Menu, Gameplay, and Game Over Screens</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: UI Panel Implementation -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-window-maximize mr-2"></i>
+                    UI Panel Implementation
+                </h3>
+                
+                <p class="text-sm mb-2">Create separate UI panels for different game states: menu, gameplay, and game over. Each panel should be anchored to the player's view in world space for optimal VR visibility.</p>
+                
+                <div class="code-block">
+<span class="code-keyword">using</span> UnityEngine;
+<span class="code-keyword">using</span> UnityEngine.UI;
+<span class="code-keyword">using</span> TMPro;
+
+<span class="code-keyword">public class</span> <span class="code-type">UIManager</span> : MonoBehaviour
+{
+    <span class="code-comment">// UI Panels</span>
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">GameObject</span> menuPanel;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">GameObject</span> gameplayPanel;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">GameObject</span> gameOverPanel;
+    
+    <span class="code-comment">// UI Elements</span>
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">TMP_Text</span> scoreText;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">TMP_Text</span> timerText;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">Button</span> startButton;
+    
+    <span class="code-keyword">void</span> <span class="code-method">Start</span>()
+    {
+        <span class="code-comment">// Set up button listeners</span>
+        startButton.onClick.AddListener(() => 
+            <span class="code-type">GameManager</span>.Instance.StartGame());
+        
+        <span class="code-comment">// Subscribe to game state changes</span>
+        <span class="code-type">GameManager</span>.Instance.OnGameStateChanged += <span class="code-method">HandleGameStateChanged</span>;
+    }
+}
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Create Canvas</div>
+                            <div class="step-description">World Space render mode</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Create UI Panels</div>
+                            <div class="step-description">Menu, Gameplay, GameOver</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Add UI Elements</div>
+                            <div class="step-description">Buttons, Text, Images</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Connect Events</div>
+                            <div class="step-description">Button click handlers</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <p class="text-sm"><span class="font-semibold unity-blue">VR UI Tip:</span> Position the canvas 1-2 meters in front of the player and scale it appropriately for comfortable viewing in VR.</p>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Visualization -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-desktop mr-2"></i>
+                    UI Panel Visualization
+                </h3>
+                
+                <div class="ui-visualization">
+                    <!-- Menu Panel -->
+                    <div class="ui-panel" id="menuPanel">
+                        <div class="panel-title">TARGET PRACTICE</div>
+                        <div class="panel-content">
+                            <button class="panel-button" id="startGameBtn">
+                                <i class="fas fa-play"></i> Start Game
+                            </button>
+                            <button class="panel-button">
+                                <i class="fas fa-cog"></i> Settings
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Gameplay Panel -->
+                    <div class="ui-panel" id="gameplayPanel">
+                        <div class="timer-display" id="timerDisplay">60</div>
+                        <div class="score-display" id="scoreDisplay">Score: 0</div>
+                    </div>
+                    
+                    <!-- Game Over Panel -->
+                    <div class="ui-panel" id="gameOverPanel">
+                        <div class="panel-title">GAME OVER</div>
+                        <div class="panel-content">
+                            <div class="score-display" id="finalScoreDisplay">Final Score: 120</div>
+                            <button class="panel-button" id="restartBtn">
+                                <i class="fas fa-redo-alt"></i> Play Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center mt-3">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-3" id="showMenuBtn">
+                        <i class="fas fa-home mr-1"></i> Menu
+                    </button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-3" id="showGameplayBtn">
+                        <i class="fas fa-gamepad mr-1"></i> Gameplay
+                    </button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" id="showGameOverBtn">
+                        <i class="fas fa-flag-checkered mr-1"></i> Game Over
+                    </button>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <p class="text-sm"><span class="font-semibold unity-blue">Button Interaction:</span> Use XR Interactable components on UI buttons to allow players to press them with their controller rays.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive UI panel visualization
+        const menuPanel = document.getElementById('menuPanel');
+        const gameplayPanel = document.getElementById('gameplayPanel');
+        const gameOverPanel = document.getElementById('gameOverPanel');
+        
+        const showMenuBtn = document.getElementById('showMenuBtn');
+        const showGameplayBtn = document.getElementById('showGameplayBtn');
+        const showGameOverBtn = document.getElementById('showGameOverBtn');
+        
+        const startGameBtn = document.getElementById('startGameBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        
+        const timerDisplay = document.getElementById('timerDisplay');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        
+        let score = 0;
+        let timer = 60;
+        let gameplayInterval;
+        
+        // Show menu panel
+        function showMenuPanel() {
+            menuPanel.classList.add('active');
+            gameplayPanel.classList.remove('active');
+            gameOverPanel.classList.remove('active');
+            
+            // Reset game state
+            clearInterval(gameplayInterval);
+            score = 0;
+            timer = 60;
+        }
+        
+        // Show gameplay panel
+        function showGameplayPanel() {
+            menuPanel.classList.remove('active');
+            gameplayPanel.classList.add('active');
+            gameOverPanel.classList.remove('active');
+            
+            // Start gameplay simulation
+            score = 0;
+            timer = 60;
+            updateGameplayDisplay();
+            
+            // Simulate gameplay
+            gameplayInterval = setInterval(() => {
+                // Decrease timer
+                timer--;
+                
+                // Randomly increase score
+                if (Math.random() > 0.7) {
+                    score += 10;
+                }
+                
+                // Update display
+                updateGameplayDisplay();
+                
+                // Check for game over
+                if (timer <= 0) {
+                    clearInterval(gameplayInterval);
+                    document.getElementById('finalScoreDisplay').textContent = `Final Score: ${score}`;
+                    showGameOverPanel();
+                }
+            }, 500);
+        }
+        
+        // Show game over panel
+        function showGameOverPanel() {
+            menuPanel.classList.remove('active');
+            gameplayPanel.classList.remove('active');
+            gameOverPanel.classList.add('active');
+            
+            // Clear gameplay interval
+            clearInterval(gameplayInterval);
+        }
+        
+        // Update gameplay display
+        function updateGameplayDisplay() {
+            timerDisplay.textContent = timer;
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+        
+        // Event listeners for visualization controls
+        showMenuBtn.addEventListener('click', showMenuPanel);
+        showGameplayBtn.addEventListener('click', showGameplayPanel);
+        showGameOverBtn.addEventListener('click', showGameOverPanel);
+        
+        // Event listeners for panel buttons
+        startGameBtn.addEventListener('click', showGameplayPanel);
+        restartBtn.addEventListener('click', showGameplayPanel);
+        
+        // Initialize with menu panel
+        showMenuPanel();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_36_game_manager.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_38_final_project.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_38_final_project.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_36_game_manager.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 41;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

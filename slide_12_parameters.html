@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Method Parameters</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .parameter-demo {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        
+        .param-tabs {
+            display: flex;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 1rem;
+        }
+        
+        .param-tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .param-tab.active {
+            border-bottom-color: #0078D7;
+            color: #0078D7;
+        }
+        
+        .param-tab:hover:not(.active) {
+            background: #f1f1f1;
+        }
+        
+        .param-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .param-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .param-visualization {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 1.5rem 0;
+        }
+        
+        .param-box {
+            width: 120px;
+            height: 80px;
+            background: #e3f2fd;
+            border: 2px solid #0078D7;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .param-box.reference {
+            background: #f3e5f5;
+            border-color: #5C2D91;
+        }
+        
+        .param-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .param-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .param-arrow {
+            flex: 1;
+            height: 3px;
+            background: #0078D7;
+            position: relative;
+            margin: 0 1rem;
+        }
+        
+        .param-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 10px solid #0078D7;
+        }
+        
+        .param-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .param-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .call-btn {
+            background: #0078D7;
+            color: white;
+        }
+        
+        .reset-btn {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .param-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .call-btn:hover {
+            background: #0069c0;
+        }
+        
+        .reset-btn:hover {
+            background: #dee2e6;
+        }
+        
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .param-table th {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .param-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 2: C# Functions & Control Flow
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-2 text-center mx-auto">Method Parameters</h1>
+            <p class="text-lg text-gray-600">Passing Data Into and Out of Methods</p>
+        </div>
+        
+        <!-- Parameter Demo -->
+        <div class="parameter-demo mb-4">
+            <div class="param-tabs">
+                <div class="param-tab active" data-tab="value">Value Parameters</div>
+                <div class="param-tab" data-tab="reference">Reference Parameters</div>
+                <div class="param-tab" data-tab="out">Out Parameters</div>
+                <div class="param-tab" data-tab="optional">Optional Parameters</div>
+            </div>
+            
+            <!-- Value Parameters -->
+            <div class="param-content active" id="valueContent">
+                <div class="code-block">
+<span class="keyword">void</span> <span class="method">ModifyValue</span>(<span class="keyword">int</span> score)
+{
+    score = score + 10; <span class="comment">// Only changes local copy</span>
+}
+
+<span class="keyword">void</span> <span class="method">Start</span>()
+{
+    <span class="keyword">int</span> playerScore = 5;
+    <span class="method">ModifyValue</span>(playerScore);
+    <span class="comment">// playerScore is still 5</span>
+}
+                </div>
+                
+                <div class="param-visualization">
+                    <div class="param-box" id="valueOriginal">
+                        <div class="param-value">5</div>
+                        <div class="param-label">playerScore</div>
+                    </div>
+                    <div class="param-arrow"></div>
+                    <div class="param-box" id="valueCopy">
+                        <div class="param-value">5</div>
+                        <div class="param-label">score (copy)</div>
+                    </div>
+                </div>
+                
+                <div class="param-controls">
+                    <button id="valueCallBtn" class="param-btn call-btn">
+                        <i class="fas fa-play mr-2"></i>
+                        Call Method
+                    </button>
+                    <button id="valueResetBtn" class="param-btn reset-btn">
+                        <i class="fas fa-redo mr-2"></i>
+                        Reset
+                    </button>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded mt-3 text-sm">
+                    <strong>Value Parameters:</strong> Pass a copy of the value. Changes inside the method don't affect the original variable.
+                </div>
+            </div>
+            
+            <!-- Reference Parameters -->
+            <div class="param-content" id="referenceContent">
+                <div class="code-block">
+<span class="keyword">void</span> <span class="method">ModifyReference</span>(<span class="keyword">ref int</span> score)
+{
+    score = score + 10; <span class="comment">// Changes original variable</span>
+}
+
+<span class="keyword">void</span> <span class="method">Start</span>()
+{
+    <span class="keyword">int</span> playerScore = 5;
+    <span class="method">ModifyReference</span>(<span class="keyword">ref</span> playerScore);
+    <span class="comment">// playerScore is now 15</span>
+}
+                </div>
+                
+                <div class="param-visualization">
+                    <div class="param-box reference" id="refOriginal">
+                        <div class="param-value">5</div>
+                        <div class="param-label">playerScore</div>
+                    </div>
+                    <div class="param-arrow" style="background: #5C2D91;"></div>
+                    <div class="param-box reference" id="refParam">
+                        <div class="param-value">5</div>
+                        <div class="param-label">score (reference)</div>
+                    </div>
+                </div>
+                
+                <div class="param-controls">
+                    <button id="refCallBtn" class="param-btn call-btn" style="background: #5C2D91;">
+                        <i class="fas fa-play mr-2"></i>
+                        Call Method
+                    </button>
+                    <button id="refResetBtn" class="param-btn reset-btn">
+                        <i class="fas fa-redo mr-2"></i>
+                        Reset
+                    </button>
+                </div>
+                
+                <div class="bg-purple-50 p-3 rounded mt-3 text-sm">
+                    <strong>Reference Parameters:</strong> Pass a reference to the original variable. Changes inside the method affect the original variable.
+                </div>
+            </div>
+            
+            <!-- Out Parameters -->
+            <div class="param-content" id="outContent">
+                <div class="code-block">
+<span class="keyword">bool</span> <span class="method">TryGetHighScore</span>(<span class="keyword">out int</span> highScore)
+{
+    highScore = 100; <span class="comment">// Must assign a value</span>
+    <span class="keyword">return true</span>;
+}
+
+<span class="keyword">void</span> <span class="method">Start</span>()
+{
+    <span class="keyword">int</span> score; <span class="comment">// No need to initialize</span>
+    <span class="keyword">if</span> (<span class="method">TryGetHighScore</span>(<span class="keyword">out</span> score))
+    {
+        <span class="comment">// score is now 100</span>
+    }
+}
+                </div>
+                
+                <div class="param-visualization">
+                    <div class="param-box" id="outOriginal" style="background: #f8d7da; border-color: #dc3545;">
+                        <div class="param-value">?</div>
+                        <div class="param-label">score (uninitialized)</div>
+                    </div>
+                    <div class="param-arrow" style="background: #dc3545;"></div>
+                    <div class="param-box" id="outParam" style="background: #d4edda; border-color: #28a745;">
+                        <div class="param-value">100</div>
+                        <div class="param-label">highScore (out)</div>
+                    </div>
+                </div>
+                
+                <div class="param-controls">
+                    <button id="outCallBtn" class="param-btn call-btn" style="background: #28a745;">
+                        <i class="fas fa-play mr-2"></i>
+                        Call Method
+                    </button>
+                    <button id="outResetBtn" class="param-btn reset-btn">
+                        <i class="fas fa-redo mr-2"></i>
+                        Reset
+                    </button>
+                </div>
+                
+                <div class="bg-green-50 p-3 rounded mt-3 text-sm">
+                    <strong>Out Parameters:</strong> Used to return multiple values from a method. The method must assign a value to the parameter.
+                </div>
+            </div>
+            
+            <!-- Optional Parameters -->
+            <div class="param-content" id="optionalContent">
+                <div class="code-block">
+<span class="keyword">void</span> <span class="method">SpawnEnemy</span>(<span class="keyword">string</span> enemyType, <span class="keyword">int</span> health = 100, <span class="keyword">bool</span> isBoss = <span class="keyword">false</span>)
+{
+    <span class="comment">// Create enemy with default or specified values</span>
+}
+
+<span class="keyword">void</span> <span class="method">Start</span>()
+{
+    <span class="method">SpawnEnemy</span>(<span class="string">"Goblin"</span>); <span class="comment">// Uses defaults</span>
+    <span class="method">SpawnEnemy</span>(<span class="string">"Dragon"</span>, 500, <span class="keyword">true</span>); <span class="comment">// Specifies all</span>
+    <span class="method">SpawnEnemy</span>(<span class="string">"Skeleton"</span>, 75); <span class="comment">// Custom health, default isBoss</span>
+}
+                </div>
+                
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Call Example</th>
+                            <th>enemyType</th>
+                            <th>health</th>
+                            <th>isBoss</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>SpawnEnemy("Goblin")</code></td>
+                            <td>"Goblin"</td>
+                            <td>100 (default)</td>
+                            <td>false (default)</td>
+                        </tr>
+                        <tr>
+                            <td><code>SpawnEnemy("Dragon", 500, true)</code></td>
+                            <td>"Dragon"</td>
+                            <td>500</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td><code>SpawnEnemy("Skeleton", 75)</code></td>
+                            <td>"Skeleton"</td>
+                            <td>75</td>
+                            <td>false (default)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="bg-yellow-50 p-3 rounded mt-3 text-sm">
+                    <strong>Optional Parameters:</strong> Provide default values that are used when the caller doesn't specify them. Must appear after all required parameters.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Best Practices -->
+        <div class="w-full max-w-4xl">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
+                <h4 class="font-semibold unity-blue mb-2">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Parameter Best Practices
+                </h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use value parameters for simple data that doesn't need to be modified</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use <code>ref</code> parameters sparingly, as they can make code harder to follow</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use <code>out</code> parameters when you need to return multiple values</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Optional parameters make APIs more flexible and easier to use</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Tab switching functionality
+        const paramTabs = document.querySelectorAll('.param-tab');
+        const paramContents = document.querySelectorAll('.param-content');
+        
+        paramTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabType = this.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                paramTabs.forEach(t => t.classList.remove('active'));
+                paramContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                document.getElementById(`${tabType}Content`).classList.add('active');
+            });
+        });
+        
+        // Value parameter demo
+        const valueOriginal = document.getElementById('valueOriginal');
+        const valueCopy = document.getElementById('valueCopy');
+        const valueCallBtn = document.getElementById('valueCallBtn');
+        const valueResetBtn = document.getElementById('valueResetBtn');
+        
+        valueCallBtn.addEventListener('click', function() {
+            // Simulate method call with value parameter
+            valueCopy.querySelector('.param-value').textContent = '15';
+            valueCopy.style.background = '#d4edda';
+            
+            // Show that original doesn't change
+            setTimeout(() => {
+                valueOriginal.style.background = '#e3f2fd';
+                valueOriginal.querySelector('.param-value').textContent = '5';
+            }, 1000);
+        });
+        
+        valueResetBtn.addEventListener('click', function() {
+            valueOriginal.style.background = '#e3f2fd';
+            valueCopy.style.background = '#e3f2fd';
+            valueOriginal.querySelector('.param-value').textContent = '5';
+            valueCopy.querySelector('.param-value').textContent = '5';
+        });
+        
+        // Reference parameter demo
+        const refOriginal = document.getElementById('refOriginal');
+        const refParam = document.getElementById('refParam');
+        const refCallBtn = document.getElementById('refCallBtn');
+        const refResetBtn = document.getElementById('refResetBtn');
+        
+        refCallBtn.addEventListener('click', function() {
+            // Simulate method call with ref parameter
+            refParam.querySelector('.param-value').textContent = '15';
+            refParam.style.background = '#d4edda';
+            
+            // Show that original also changes
+            setTimeout(() => {
+                refOriginal.style.background = '#d4edda';
+                refOriginal.querySelector('.param-value').textContent = '15';
+            }, 1000);
+        });
+        
+        refResetBtn.addEventListener('click', function() {
+            refOriginal.style.background = '#f3e5f5';
+            refParam.style.background = '#f3e5f5';
+            refOriginal.querySelector('.param-value').textContent = '5';
+            refParam.querySelector('.param-value').textContent = '5';
+        });
+        
+        // Out parameter demo
+        const outOriginal = document.getElementById('outOriginal');
+        const outParam = document.getElementById('outParam');
+        const outCallBtn = document.getElementById('outCallBtn');
+        const outResetBtn = document.getElementById('outResetBtn');
+        
+        outCallBtn.addEventListener('click', function() {
+            // Simulate method call with out parameter
+            outParam.querySelector('.param-value').textContent = '100';
+            
+            // Show that original gets the value
+            setTimeout(() => {
+                outOriginal.style.background = '#d4edda';
+                outOriginal.style.borderColor = '#28a745';
+                outOriginal.querySelector('.param-value').textContent = '100';
+            }, 1000);
+        });
+        
+        outResetBtn.addEventListener('click', function() {
+            outOriginal.style.background = '#f8d7da';
+            outOriginal.style.borderColor = '#dc3545';
+            outParam.style.background = '#d4edda';
+            outParam.style.borderColor = '#28a745';
+            outOriginal.querySelector('.param-value').textContent = '?';
+            outParam.querySelector('.param-value').textContent = '100';
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_11_methods.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_13_organizing_code.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_13_organizing_code.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_11_methods.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 14;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

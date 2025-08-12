@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow: auto;
+            max-height: 140px;
+        }
+        
+        .code-comment { color: #6A9955; }
+        .code-keyword { color: #569CD6; }
+        .code-string { color: #CE9178; }
+        .code-method { color: #DCDCAA; }
+        .code-type { color: #4EC9B0; }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .gamestate-visualization {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .state-node {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .state-node.active {
+            background: #0078D7;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 120, 215, 0.6);
+        }
+        
+        .state-node.active .state-icon,
+        .state-node.active .state-label {
+            color: white;
+        }
+        
+        .state-icon {
+            font-size: 2rem;
+            color: #0078D7;
+            margin-bottom: 0.5rem;
+        }
+        
+        .state-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #5C2D91;
+        }
+        
+        .state-arrow {
+            position: absolute;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.7);
+            transform-origin: left;
+        }
+        
+        .state-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid rgba(255, 255, 255, 0.7);
+        }
+        
+        .state-arrow.active {
+            background: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        .state-arrow.active::after {
+            border-left-color: white;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-cube mr-2"></i>
+                Part 4: Target Practice Game
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Game Manager</h1>
+            <p class="text-lg text-gray-600">Coordinating Game Components and States</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Game Manager Implementation -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-cogs mr-2"></i>
+                    Game Manager Implementation
+                </h3>
+                
+                <p class="text-sm mb-2">Create a GameManager script to coordinate all game components and manage game state transitions. This central controller ensures proper communication between systems.</p>
+                
+                <div class="code-block">
+<span class="code-keyword">using</span> UnityEngine;
+<span class="code-keyword">using</span> TMPro;
+
+<span class="code-keyword">public class</span> <span class="code-type">GameManager</span> : MonoBehaviour
+{
+    <span class="code-comment">// Singleton instance</span>
+    <span class="code-keyword">public static</span> <span class="code-type">GameManager</span> Instance { <span class="code-keyword">get</span>; <span class="code-keyword">private set</span>; }
+    
+    <span class="code-comment">// Game state</span>
+    <span class="code-keyword">public enum</span> <span class="code-type">GameState</span> { Menu, Playing, GameOver }
+    <span class="code-keyword">private</span> <span class="code-type">GameState</span> currentState;
+    
+    <span class="code-comment">// References</span>
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">GameTimer</span> gameTimer;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">ScoreManager</span> scoreManager;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">TargetSpawner</span> targetSpawner;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">GameObject</span> menuPanel;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">GameObject</span> gameOverPanel;
+    
+    <span class="code-keyword">void</span> <span class="code-method">Awake</span>()
+    {
+        <span class="code-comment">// Singleton pattern</span>
+        <span class="code-keyword">if</span> (Instance == <span class="code-keyword">null</span>)
+        {
+            Instance = <span class="code-keyword">this</span>;
+        }
+        <span class="code-keyword">else if</span> (Instance != <span class="code-keyword">this</span>)
+        {
+            Destroy(gameObject);
+        }
+    }
+    
+    <span class="code-keyword">void</span> <span class="code-method">Start</span>()
+    {
+        <span class="code-comment">// Subscribe to events</span>
+        gameTimer.OnGameEnd += <span class="code-method">HandleGameOver</span>;
+        
+        <span class="code-comment">// Set initial state</span>
+        <span class="code-method">SetGameState</span>(<span class="code-type">GameState</span>.Menu);
+    }
+    
+    <span class="code-keyword">public void</span> <span class="code-method">StartGame</span>()
+    {
+        <span class="code-method">SetGameState</span>(<span class="code-type">GameState</span>.Playing);
+        scoreManager.ResetScore();
+        gameTimer.StartGame();
+        targetSpawner.StartSpawning();
+    }
+}
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Implement Singleton</div>
+                            <div class="step-description">Global access pattern</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Define Game States</div>
+                            <div class="step-description">Menu, Playing, GameOver</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Connect Components</div>
+                            <div class="step-description">Timer, Score, Spawner</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Handle State Changes</div>
+                            <div class="step-description">UI panel visibility</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <p class="text-sm"><span class="font-semibold unity-blue">Singleton Pattern:</span> Use <code class="bg-white px-1 py-0.5 rounded">GameManager.Instance</code> to access the game manager from any script without needing direct references.</p>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Visualization -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-project-diagram mr-2"></i>
+                    Game State Flow
+                </h3>
+                
+                <div class="gamestate-visualization" id="gamestateVisualization">
+                    <!-- State nodes and arrows will be added by JavaScript -->
+                </div>
+                
+                <div class="flex justify-center mt-3">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-3" id="startBtn">
+                        <i class="fas fa-play mr-1"></i> Start Game
+                    </button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" id="resetBtn">
+                        <i class="fas fa-redo-alt mr-1"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <div class="font-semibold unity-blue">State Management:</div>
+                    <p class="text-sm">Use a central SetGameState() method to handle all state transitions, ensuring consistent behavior when changing between menu, gameplay, and game over states.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive game state visualization
+        const gamestateVisualization = document.getElementById('gamestateVisualization');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // Define states
+        const states = [
+            { id: 'menu', icon: 'fa-home', label: 'Menu', x: 60, y: 110 },
+            { id: 'playing', icon: 'fa-gamepad', label: 'Playing', x: 230, y: 110 },
+            { id: 'gameover', icon: 'fa-flag-checkered', label: 'Game Over', x: 400, y: 110 }
+        ];
+        
+        // Define transitions
+        const transitions = [
+            { from: 'menu', to: 'playing', label: 'Start Game' },
+            { from: 'playing', to: 'gameover', label: 'Time\'s Up' },
+            { from: 'gameover', to: 'menu', label: 'Restart' }
+        ];
+        
+        // Create state nodes
+        states.forEach(state => {
+            const stateNode = document.createElement('div');
+            stateNode.id = `state-${state.id}`;
+            stateNode.className = 'state-node';
+            stateNode.style.left = `${state.x}px`;
+            stateNode.style.top = `${state.y}px`;
+            
+            stateNode.innerHTML = `
+                <div class="state-icon">
+                    <i class="fas ${state.icon}"></i>
+                </div>
+                <div class="state-label">${state.label}</div>
+            `;
+            
+            gamestateVisualization.appendChild(stateNode);
+        });
+        
+        // Create transition arrows
+        transitions.forEach(transition => {
+            const arrow = document.createElement('div');
+            arrow.id = `arrow-${transition.from}-${transition.to}`;
+            arrow.className = 'state-arrow';
+            gamestateVisualization.appendChild(arrow);
+            
+            // Position will be set in positionArrows function
+        });
+        
+        // Position arrows
+        function positionArrows() {
+            transitions.forEach(transition => {
+                const fromElement = document.getElementById(`state-${transition.from}`);
+                const toElement = document.getElementById(`state-${transition.to}`);
+                
+                const fromRect = fromElement.getBoundingClientRect();
+                const toRect = toElement.getBoundingClientRect();
+                
+                const fromCenterX = fromRect.left + fromRect.width / 2;
+                const fromCenterY = fromRect.top + fromRect.height / 2;
+                const toCenterX = toRect.left + toRect.width / 2;
+                const toCenterY = toRect.top + toRect.height / 2;
+                
+                const dx = toCenterX - fromCenterX;
+                const dy = toCenterY - fromCenterY;
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                const length = Math.sqrt(dx * dx + dy * dy) - 100; // Adjust for node size
+                
+                const arrowElement = document.getElementById(`arrow-${transition.from}-${transition.to}`);
+                arrowElement.style.width = `${length}px`;
+                arrowElement.style.left = `${fromCenterX - gamestateVisualization.getBoundingClientRect().left + 50}px`;
+                arrowElement.style.top = `${fromCenterY - gamestateVisualization.getBoundingClientRect().top}px`;
+                arrowElement.style.transform = `rotate(${angle}deg)`;
+            });
+        }
+        
+        // Call once to position initially
+        setTimeout(positionArrows, 100);
+        
+        // Game state simulation
+        let currentState = 'menu';
+        
+        function updateStateVisual() {
+            // Reset all states
+            states.forEach(state => {
+                const stateNode = document.getElementById(`state-${state.id}`);
+                stateNode.classList.remove('active');
+            });
+            
+            // Reset all arrows
+            transitions.forEach(transition => {
+                const arrow = document.getElementById(`arrow-${transition.from}-${transition.to}`);
+                arrow.classList.remove('active');
+            });
+            
+            // Activate current state
+            const currentNode = document.getElementById(`state-${currentState}`);
+            currentNode.classList.add('active');
+            
+            // Update button states
+            if (currentState === 'menu') {
+                startBtn.disabled = false;
+                startBtn.classList.remove('opacity-50');
+                resetBtn.disabled = true;
+                resetBtn.classList.add('opacity-50');
+            } else if (currentState === 'playing') {
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50');
+                resetBtn.disabled = false;
+                resetBtn.classList.remove('opacity-50');
+            } else if (currentState === 'gameover') {
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50');
+                resetBtn.disabled = false;
+                resetBtn.classList.remove('opacity-50');
+            }
+        }
+        
+        // Transition to a new state
+        function transitionTo(newState) {
+            // Find the transition
+            const transition = transitions.find(t => t.from === currentState && t.to === newState);
+            if (!transition) return;
+            
+            // Highlight the transition arrow
+            const arrow = document.getElementById(`arrow-${transition.from}-${transition.to}`);
+            arrow.classList.add('active');
+            
+            // Change state after a delay
+            setTimeout(() => {
+                currentState = newState;
+                updateStateVisual();
+            }, 500);
+        }
+        
+        // Start game
+        startBtn.addEventListener('click', function() {
+            if (currentState === 'menu') {
+                transitionTo('playing');
+                
+                // Auto transition to game over after 3 seconds
+                setTimeout(() => {
+                    if (currentState === 'playing') {
+                        transitionTo('gameover');
+                    }
+                }, 3000);
+            }
+        });
+        
+        // Reset game
+        resetBtn.addEventListener('click', function() {
+            if (currentState === 'playing' || currentState === 'gameover') {
+                transitionTo('menu');
+            }
+        });
+        
+        // Initialize
+        updateStateVisual();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_35_game_timer.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_37_game_ui_panels.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_37_game_ui_panels.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_35_game_timer.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 40;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

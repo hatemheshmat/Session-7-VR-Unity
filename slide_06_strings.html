@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strings & Concatenation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .string-builder {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            border: 2px solid #dee2e6;
+        }
+        
+        .string-input {
+            background: white;
+            border: 2px solid #0078D7;
+            border-radius: 8px;
+            padding: 0.5rem;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .string-input:focus {
+            outline: none;
+            border-color: #5C2D91;
+            box-shadow: 0 0 0 3px rgba(92, 45, 145, 0.2);
+        }
+        
+        .string-result {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+            position: relative;
+            min-height: 60px;
+        }
+        
+        .string-result::before {
+            content: 'Result';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #0078D7;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .string-keyword { color: #569cd6; }
+        .string-text { color: #ce9178; }
+        .string-method { color: #dcdcaa; }
+        .string-variable { color: #9cdcfe; }
+        
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .method-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.5rem;
+            border-left: 3px solid #0078D7;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .method-item:hover {
+            background: #e9ecef;
+            transform: translateX(3px);
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-2">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Strings & Concatenation</h1>
+            <p class="text-lg text-gray-600">Building Messages in Unity C#</p>
+        </div>
+        
+        <div class="w-full grid grid-rows-1 grid-cols-1">
+            <!-- Interactive String Builder -->
+            <div class="string-builder mb-2">
+                <h3 class="text-xl font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-quote-right mr-2"></i>
+                    String Concatenation Builder
+                </h3>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Player Name:</label>
+                        <input type="text" id="playerName" class="string-input" value="Player1" placeholder="Enter player name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Score Value:</label>
+                        <input type="number" id="scoreValue" class="string-input" value="100" min="0" max="999">
+                    </div>
+                </div>
+                
+                <div class="string-result">
+                    <div id="codeResult">
+                        <span class="string-keyword">string</span> <span class="string-variable">playerName</span> = <span class="string-text">"Player1"</span>;<br>
+                        <span class="string-keyword">int</span> <span class="string-variable">score</span> = <span class="string-text">100</span>;<br>
+                        <span class="string-keyword">string</span> <span class="string-variable">message</span> = <span class="string-text">"Player: "</span> + <span class="string-variable">playerName</span> + <span class="string-text">", Score: "</span> + <span class="string-variable">score</span>;
+                    </div>
+                </div>
+                
+                <div class="flex justify-evenly space-x-2 mt-2">
+                    <button id="concatBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition text-sm">
+                        <i class="fas fa-plus mr-1"></i> Concatenation (+)
+                    </button>
+                    <button id="formatBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-md transition text-sm">
+                        <i class="fas fa-code mr-1"></i> String.Format()
+                    </button>
+                    <button id="interpolationBtn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition text-sm">
+                        <i class="fas fa-dollar-sign mr-1"></i> Interpolation ($)
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Section -->
+        <div class="w-full max-w-4xl">
+            <div class="grid grid-cols-1 gap-2">
+                <!-- String Methods -->
+                <div>
+                    <h3 class="text-xl font-semibold unity-blue text-center mb-2 text-center mx-auto">Common String Operations</h3>
+                    <div class="method-grid">
+                        <div class="method-item" data-method="length">
+                            <h4 class="font-semibold">Length Property</h4>
+                            <p class="text-sm text-gray-600">Gets the number of characters</p>
+                            <div class="code-snippet">
+                                <span class="string-keyword">string</span> name = <span class="string-text">"Unity"</span>;<br>
+                                <span class="string-keyword">int</span> length = name.<span class="string-method">Length</span>; <span class="text-gray-500">// 5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="method-item" data-method="substring">
+                            <h4 class="font-semibold">Substring Method</h4>
+                            <p class="text-sm text-gray-600">Extracts part of a string</p>
+                            <div class="code-snippet">
+                                <span class="string-keyword">string</span> text = <span class="string-text">"Unity3D"</span>;<br>
+                                <span class="string-keyword">string</span> sub = text.<span class="string-method">Substring</span>(0, 5); <span class="text-gray-500">// "Unity"</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Key Points -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg">
+                    <h4 class="font-semibold unity-blue mb-1">
+                        <i class="fas fa-key mr-2"></i>
+                        Key Points
+                    </h4>
+                    <ul class="text-sm grid grid-cols-2 gap-2">
+                        <li><i class="fas fa-check-circle text-green-500 mr-1"></i> Strings are immutable (unchangeable)</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-1"></i> Use + operator to combine strings</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-1"></i> String interpolation is more efficient</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-1"></i> StringBuilder for complex concatenation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive string builder functionality
+        const playerNameInput = document.getElementById('playerName');
+        const scoreValueInput = document.getElementById('scoreValue');
+        const codeResult = document.getElementById('codeResult');
+        const concatBtn = document.getElementById('concatBtn');
+        const formatBtn = document.getElementById('formatBtn');
+        const interpolationBtn = document.getElementById('interpolationBtn');
+        
+        function updateConcatenation() {
+            const playerName = playerNameInput.value || "Player1";
+            const score = scoreValueInput.value || "0";
+            
+            codeResult.innerHTML = `
+                <span class="string-keyword">string</span> <span class="string-variable">playerName</span> = <span class="string-text">"${playerName}"</span>;<br>
+                <span class="string-keyword">int</span> <span class="string-variable">score</span> = <span class="string-text">${score}</span>;<br>
+                <span class="string-keyword">string</span> <span class="string-variable">message</span> = <span class="string-text">"Player: "</span> + <span class="string-variable">playerName</span> + <span class="string-text">", Score: "</span> + <span class="string-variable">score</span>;
+            `;
+        }
+        
+        function updateStringFormat() {
+            const playerName = playerNameInput.value || "Player1";
+            const score = scoreValueInput.value || "0";
+            
+            codeResult.innerHTML = `
+                <span class="string-keyword">string</span> <span class="string-variable">playerName</span> = <span class="string-text">"${playerName}"</span>;<br>
+                <span class="string-keyword">int</span> <span class="string-variable">score</span> = <span class="string-text">${score}</span>;<br>
+                <span class="string-keyword">string</span> <span class="string-variable">message</span> = <span class="string-method">string.Format</span>(<span class="string-text">"Player: {0}, Score: {1}"</span>, <span class="string-variable">playerName</span>, <span class="string-variable">score</span>);
+            `;
+        }
+        
+        function updateInterpolation() {
+            const playerName = playerNameInput.value || "Player1";
+            const score = scoreValueInput.value || "0";
+            
+            codeResult.innerHTML = `
+                <span class="string-keyword">string</span> <span class="string-variable">playerName</span> = <span class="string-text">"${playerName}"</span>;<br>
+                <span class="string-keyword">int</span> <span class="string-variable">score</span> = <span class="string-text">${score}</span>;<br>
+                <span class="string-keyword">string</span> <span class="string-variable">message</span> = $<span class="string-text">"Player: {playerName}, Score: {score}"</span>;
+            `;
+        }
+        
+        // Add event listeners
+        playerNameInput.addEventListener('input', updateConcatenation);
+        scoreValueInput.addEventListener('input', updateConcatenation);
+        concatBtn.addEventListener('click', updateConcatenation);
+        formatBtn.addEventListener('click', updateStringFormat);
+        interpolationBtn.addEventListener('click', updateInterpolation);
+        
+        // Method items click handlers
+        document.querySelectorAll('.method-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.transform = 'translateX(5px)';
+                setTimeout(() => {
+                    this.style.transform = 'translateX(3px)';
+                }, 150);
+            });
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_05_numeric_types.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_07_booleans.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_07_booleans.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_05_numeric_types.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 8;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

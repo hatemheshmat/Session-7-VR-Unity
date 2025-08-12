@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common Numeric Types</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .type-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .type-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid #0078D7;
+            transition: all 0.3s ease;
+        }
+        
+        .type-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .type-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .type-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .int-icon {
+            background: #0078D7;
+        }
+        
+        .float-icon {
+            background: #5C2D91;
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+        
+        .highlight-blue { color: #4fc3f7; }
+        .highlight-green { color: #81c784; }
+        .highlight-yellow { color: #ffb74d; }
+        
+        .converter-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #dee2e6;
+        }
+        
+        .converter-title {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #0078D7;
+        }
+        
+        .converter-form {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .converter-input {
+            padding: 0.5rem;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .converter-arrow {
+            font-size: 1.5rem;
+            color: #5C2D91;
+            text-align: center;
+        }
+        
+        .converter-result {
+            padding: 0.5rem;
+            background: #e9ecef;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .converter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .converter-button {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .int-to-float {
+            background: #e3f2fd;
+            color: #0078D7;
+            border: 2px solid #0078D7;
+        }
+        
+        .float-to-int {
+            background: #f3e5f5;
+            color: #5C2D91;
+            border: 2px solid #5C2D91;
+        }
+        
+        .converter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .casting-examples {
+            background: #f0f9ff;
+            border-left: 4px solid #0078D7;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        
+        .casting-title {
+            font-weight: 600;
+            color: #0078D7;
+            margin-bottom: 0.5rem;
+        }
+        
+        .casting-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-2 text-center mx-auto">Common Numeric Types</h1>
+            <p class="text-lg text-gray-600">int vs float differences and casting basics</p>
+        </div>
+        
+        <!-- Type Comparison -->
+        <div class="type-comparison mb-4">
+            <!-- Integer Type -->
+            <div class="type-card">
+                <div class="type-header">
+                    <div class="type-icon int-icon">int</div>
+                    <h3 class="text-xl font-semibold text-center mx-auto">Integer (int)</h3>
+                </div>
+                <ul class="text-gray-700 space-y-1 text-sm mb-2">
+                    <li>• Whole numbers only (no decimals)</li>
+                    <li>• Range: -2,147,483,648 to 2,147,483,647</li>
+                    <li>• 32-bit signed integer</li>
+                    <li>• Use for: counters, indices, whole values</li>
+                </ul>
+                <div class="code-snippet">
+<span class="highlight-blue">int</span> score = <span class="highlight-yellow">100</span>;
+<span class="highlight-blue">int</span> playerLevel = <span class="highlight-yellow">5</span>;
+<span class="highlight-blue">int</span> totalPoints = score * playerLevel;
+                </div>
+            </div>
+            
+            <!-- Float Type -->
+            <div class="type-card">
+                <div class="type-header">
+                    <div class="type-icon float-icon">float</div>
+                    <h3 class="text-xl font-semibold text-center mx-auto">Float (float)</h3>
+                </div>
+                <ul class="text-gray-700 space-y-1 text-sm mb-2">
+                    <li>• Decimal point numbers</li>
+                    <li>• ~7 digits of precision</li>
+                    <li>• 32-bit floating point</li>
+                    <li>• Use for: positions, speeds, percentages</li>
+                </ul>
+                <div class="code-snippet">
+<span class="highlight-blue">float</span> speed = <span class="highlight-yellow">5.75f</span>; <span class="highlight-green">// Note the 'f' suffix</span>
+<span class="highlight-blue">float</span> distance = <span class="highlight-yellow">12.3f</span>;
+<span class="highlight-blue">float</span> time = distance / speed;
+                </div>
+            </div>
+        </div>
+        
+        <!-- Type Conversion Calculator -->
+        <div class="converter-container">
+            <div class="converter-title">
+                <i class="fas fa-exchange-alt mr-2"></i>
+                Type Conversion Calculator
+            </div>
+            
+            <div class="converter-form">
+                <input type="text" id="inputValue" class="converter-input" placeholder="Enter a number...">
+                <div class="converter-arrow">→</div>
+                <div id="resultValue" class="converter-result">Result will appear here</div>
+            </div>
+            
+            <div class="converter-buttons">
+                <button id="intToFloat" class="converter-button int-to-float">
+                    <i class="fas fa-long-arrow-alt-right mr-1"></i>
+                    int to float
+                </button>
+                <button id="floatToInt" class="converter-button float-to-int">
+                    <i class="fas fa-long-arrow-alt-right mr-1"></i>
+                    float to int
+                </button>
+            </div>
+        </div>
+        
+        <!-- Casting Examples -->
+        <div class="casting-examples w-full max-w-4xl">
+            <div class="casting-title">
+                <i class="fas fa-code mr-2"></i>
+                Casting Examples
+            </div>
+            
+            <div class="casting-grid">
+                <div>
+                    <strong class="unity-blue">Implicit Casting:</strong>
+                    <div class="code-snippet">
+<span class="highlight-blue">int</span> score = <span class="highlight-yellow">10</span>;
+<span class="highlight-blue">float</span> scoreFloat = score; <span class="highlight-green">// 10.0f</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <strong class="meta-purple">Explicit Casting:</strong>
+                    <div class="code-snippet">
+<span class="highlight-blue">float</span> health = <span class="highlight-yellow">75.8f</span>;
+<span class="highlight-blue">int</span> healthInt = (<span class="highlight-blue">int</span>)health; <span class="highlight-green">// 75</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Type Conversion Calculator Functionality
+        document.getElementById('intToFloat').addEventListener('click', function() {
+            const inputValue = document.getElementById('inputValue').value;
+            if (!inputValue || isNaN(parseInt(inputValue))) {
+                document.getElementById('resultValue').textContent = 'Please enter a valid integer';
+                return;
+            }
+            
+            const intValue = parseInt(inputValue);
+            const floatValue = parseFloat(intValue);
+            
+            document.getElementById('resultValue').textContent = `${floatValue.toFixed(1)}f`;
+            document.getElementById('resultValue').style.backgroundColor = '#e3f2fd';
+        });
+        
+        document.getElementById('floatToInt').addEventListener('click', function() {
+            const inputValue = document.getElementById('inputValue').value;
+            if (!inputValue || isNaN(parseFloat(inputValue))) {
+                document.getElementById('resultValue').textContent = 'Please enter a valid number';
+                return;
+            }
+            
+            const floatValue = parseFloat(inputValue);
+            const intValue = Math.floor(floatValue); // Using floor to simulate C# casting behavior
+            
+            document.getElementById('resultValue').textContent = `${intValue} (truncated)`;
+            document.getElementById('resultValue').style.backgroundColor = '#f3e5f5';
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_04_fields_vs_local.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_06_strings.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_06_strings.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_04_fields_vs_local.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 7;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

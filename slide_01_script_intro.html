@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is a Script in Unity?</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .hierarchy-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .hierarchy-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .hierarchy-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .hierarchy-item.script {
+            background: #e3f2fd;
+            border-left: 4px solid #0078D7;
+        }
+        
+        .hierarchy-item.script:hover {
+            background: #bbdefb;
+        }
+        
+        .hierarchy-icon {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .indent-1 { margin-left: 1rem; }
+        .indent-2 { margin-left: 2rem; }
+        .indent-3 { margin-left: 3rem; }
+        
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .concept-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #0078D7;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+        
+        .code-snippet::before {
+            content: 'C#';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #0078D7;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+        
+        .highlight-blue { color: #4fc3f7; }
+        .highlight-green { color: #81c784; }
+        .highlight-yellow { color: #ffb74d; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-3 text-center mx-auto">What is a Script in Unity?</h1>
+            <p class="text-xl text-gray-600">Understanding MonoBehaviour and Script Organization</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="concept-grid mb-6">
+            <!-- Left: Concept Explanation -->
+            <div class="concept-card">
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Script = Component
+                </h3>
+                <ul class="text-gray-700 space-y-2">
+                    <li>• Scripts are <strong>components</strong> in Unity</li>
+                    <li>• Attach to GameObjects to add behavior</li>
+                    <li>• Inherit from <code class="bg-gray-200 px-1 rounded">MonoBehaviour</code></li>
+                    <li>• Written in C# programming language</li>
+                </ul>
+                
+                <div class="code-snippet mt-4">
+<span class="highlight-blue">using</span> UnityEngine;
+
+<span class="highlight-blue">public class</span> <span class="highlight-yellow">ScoreDemo</span> : <span class="highlight-green">MonoBehaviour</span>
+{
+    <span class="highlight-blue">public int</span> score = <span class="highlight-yellow">0</span>;
+    
+    <span class="highlight-blue">void</span> <span class="highlight-yellow">Start</span>()
+    {
+        <span class="highlight-green">Debug.Log</span>(<span class="highlight-yellow">"Score: "</span> + score);
+    }
+}
+                </div>
+            </div>
+            
+            <!-- Right: Project Hierarchy -->
+            <div class="concept-card">
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">
+                    <i class="fas fa-folder-tree mr-2"></i>
+                    Where Scripts Live
+                </h3>
+                
+                <div class="hierarchy-container">
+                    <div class="hierarchy-item">
+                        <i class="fas fa-folder hierarchy-icon text-yellow-600"></i>
+                        <span class="font-medium">Assets</span>
+                    </div>
+                    <div class="hierarchy-item indent-1">
+                        <i class="fas fa-folder hierarchy-icon text-yellow-600"></i>
+                        <span>Scripts</span>
+                    </div>
+                    <div class="hierarchy-item script indent-2">
+                        <i class="fas fa-file-code hierarchy-icon unity-blue"></i>
+                        <span class="font-medium">ScoreDemo.cs</span>
+                    </div>
+                    <div class="hierarchy-item script indent-2">
+                        <i class="fas fa-file-code hierarchy-icon unity-blue"></i>
+                        <span class="font-medium">PlayerController.cs</span>
+                    </div>
+                    <div class="hierarchy-item indent-1">
+                        <i class="fas fa-folder hierarchy-icon text-yellow-600"></i>
+                        <span>Scenes</span>
+                    </div>
+                    <div class="hierarchy-item indent-2">
+                        <i class="fas fa-cube hierarchy-icon text-blue-600"></i>
+                        <span>VRScene.unity</span>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-600 mt-3 text-center">
+                    Click items to explore the project structure
+                </p>
+            </div>
+        </div>
+        
+        <!-- Key Points -->
+        <div class="w-full max-w-4xl">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <h4 class="font-semibold unity-blue mb-2">
+                    <i class="fas fa-key mr-2"></i>
+                    Key Concepts
+                </h4>
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                    <div class="text-center">
+                        <i class="fas fa-puzzle-piece text-2xl meta-purple mb-2"></i>
+                        <p><strong>Component-Based</strong><br>Scripts add functionality to objects</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-inheritance text-2xl meta-purple mb-2"></i>
+                        <p><strong>MonoBehaviour</strong><br>Base class for Unity scripts</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-folder-open text-2xl meta-purple mb-2"></i>
+                        <p><strong>Organization</strong><br>Keep scripts in Assets/Scripts folder</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Add interactivity to hierarchy items
+        document.querySelectorAll('.hierarchy-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.hierarchy-item').forEach(i => i.classList.remove('bg-blue-100'));
+                // Add active class to clicked item
+                this.classList.add('bg-blue-100');
+                
+                // Show tooltip or additional info
+                const tooltip = document.createElement('div');
+                tooltip.className = 'absolute bg-gray-800 text-white p-2 rounded text-sm z-10';
+                tooltip.style.top = '10px';
+                tooltip.style.right = '10px';
+                
+                if (this.textContent.includes('.cs')) {
+                    tooltip.textContent = 'C# Script File - Contains game logic and behavior';
+                } else if (this.textContent.includes('.unity')) {
+                    tooltip.textContent = 'Unity Scene File - Contains game objects and their setup';
+                } else {
+                    tooltip.textContent = 'Project Folder - Organizes your assets';
+                }
+                
+                // Remove existing tooltips
+                document.querySelectorAll('.absolute.bg-gray-800').forEach(t => t.remove());
+                
+                // Add new tooltip
+                this.style.position = 'relative';
+                this.appendChild(tooltip);
+                
+                // Remove tooltip after 3 seconds
+                setTimeout(() => {
+                    if (tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                }, 3000);
+            });
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_00_agenda.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_02_csharp_unity.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_02_csharp_unity.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_00_agenda.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 3;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

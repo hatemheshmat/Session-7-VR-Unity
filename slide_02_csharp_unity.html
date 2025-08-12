@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C# in Unity</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .syntax-highlighter {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            border: 2px solid #333;
+        }
+        
+        .syntax-highlighter::before {
+            content: 'Unity C# Editor';
+            position: absolute;
+            top: -12px;
+            left: 1rem;
+            background: #0078D7;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .code-line {
+            display: flex;
+            align-items: center;
+            margin: 0.25rem 0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+        }
+        
+        .code-line:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .line-number {
+            color: #6b7280;
+            width: 25px;
+            text-align: right;
+            margin-right: 0.75rem;
+            font-size: 0.7rem;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .feature-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border-left: 4px solid #0078D7;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #5C2D91;
+        }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .explanation-tooltip {
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            max-width: 200px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .explanation-tooltip.show {
+            opacity: 1;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-2 text-center mx-auto">C# in Unity</h1>
+            <p class="text-lg text-gray-600">Language, Runtime, and Why We Use It</p>
+        </div>
+        
+        <!-- Interactive Syntax Highlighter -->
+        <div class="mb-4">
+            <div class="syntax-highlighter">
+                <div class="code-line" data-explanation="using directive imports Unity's core functionality">
+                    <span class="line-number">1</span>
+                    <span><span class="keyword">using</span> <span class="type">UnityEngine</span>;</span>
+                </div>
+                <div class="code-line" data-explanation="Class declaration inheriting from MonoBehaviour">
+                    <span class="line-number">2</span>
+                    <span><span class="keyword">public class</span> <span class="type">ScoreDemo</span> : <span class="type">MonoBehaviour</span></span>
+                </div>
+                <div class="code-line" data-explanation="Opening brace starts the class body">
+                    <span class="line-number">3</span>
+                    <span>{</span>
+                </div>
+                <div class="code-line" data-explanation="Public field - visible in Unity Inspector">
+                    <span class="line-number">4</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span> <span class="keyword">int</span> score = <span class="number">0</span>;</span>
+                </div>
+                <div class="code-line" data-explanation="Start method - called once when the game begins">
+                    <span class="line-number">5</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">void</span> <span class="method">Start</span>() {</span>
+                </div>
+                <div class="code-line" data-explanation="Debug.Log prints messages to Unity Console">
+                    <span class="line-number">6</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">Debug</span>.<span class="method">Log</span>(<span class="string">"Score: "</span> + score);</span>
+                </div>
+                <div class="code-line" data-explanation="Closing braces end method and class">
+                    <span class="line-number">7</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;}</span>
+                </div>
+                <div class="code-line">
+                    <span class="line-number">8</span>
+                    <span>}</span>
+                </div>
+                
+                <div class="explanation-tooltip" id="tooltip"></div>
+            </div>
+            <p class="text-center text-sm text-gray-600 mt-2">Hover over code lines to see explanations</p>
+        </div>
+        
+        <!-- C# Features in Unity -->
+        <div class="w-full max-w-4xl">
+            <h3 class="text-xl font-semibold unity-blue text-center mb-3 text-center mx-auto">Why C# for Unity?</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i class="fas fa-rocket feature-icon"></i>
+                    <h4 class="font-semibold mb-1">Performance</h4>
+                    <p class="text-gray-700 text-sm">Compiled language with excellent runtime performance for VR</p>
+                </div>
+                
+                <div class="feature-item">
+                    <i class="fas fa-puzzle-piece feature-icon"></i>
+                    <h4 class="font-semibold mb-1">Object-Oriented</h4>
+                    <p class="text-gray-700 text-sm">Classes and inheritance perfect for game components</p>
+                </div>
+                
+                <div class="feature-item">
+                    <i class="fas fa-tools feature-icon"></i>
+                    <h4 class="font-semibold mb-1">Rich Ecosystem</h4>
+                    <p class="text-gray-700 text-sm">Extensive .NET libraries and Unity-specific APIs</p>
+                </div>
+            </div>
+            
+            <!-- Key Points -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg mt-4">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <strong>Mono Runtime:</strong> Cross-platform .NET implementation
+                    </div>
+                    <div>
+                        <strong>IL2CPP:</strong> Ahead-of-time compilation for performance
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Add interactivity to code lines
+        const codeLines = document.querySelectorAll('.code-line');
+        const tooltip = document.getElementById('tooltip');
+        
+        codeLines.forEach(line => {
+            line.addEventListener('mouseenter', function(e) {
+                const explanation = this.getAttribute('data-explanation');
+                if (explanation) {
+                    tooltip.textContent = explanation;
+                    tooltip.classList.add('show');
+                    
+                    // Position tooltip
+                    const rect = this.getBoundingClientRect();
+                    const containerRect = document.querySelector('.syntax-highlighter').getBoundingClientRect();
+                    
+                    tooltip.style.left = (rect.right - containerRect.left + 10) + 'px';
+                    tooltip.style.top = (rect.top - containerRect.top) + 'px';
+                }
+            });
+            
+            line.addEventListener('mouseleave', function() {
+                tooltip.classList.remove('show');
+            });
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_01_script_intro.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_03_variables_101.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_03_variables_101.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_01_script_intro.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 4;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

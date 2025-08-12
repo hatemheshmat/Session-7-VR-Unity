@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>If-Else Statements</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        
+        .flow-diagram {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin: 0 auto;
+        }
+        
+        .flow-node {
+            position: absolute;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .condition-node {
+            width: 180px;
+            height: 80px;
+            background: #e3f2fd;
+            border: 2px solid #0078D7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        
+        .true-node {
+            width: 150px;
+            height: 60px;
+            background: #d4edda;
+            border: 2px solid #28a745;
+            left: 25%;
+            top: 120px;
+            transform: translateX(-50%);
+        }
+        
+        .false-node {
+            width: 150px;
+            height: 60px;
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            left: 75%;
+            top: 120px;
+            transform: translateX(-50%);
+        }
+        
+        .end-node {
+            width: 150px;
+            height: 60px;
+            background: #f8f9fa;
+            border: 2px solid #6c757d;
+            left: 50%;
+            top: 220px;
+            transform: translateX(-50%);
+        }
+        
+        .flow-arrow {
+            position: absolute;
+            background: #6c757d;
+            z-index: -1;
+        }
+        
+        .condition-true {
+            width: 2px;
+            height: 40px;
+            left: 25%;
+            top: 80px;
+        }
+        
+        .condition-true::after {
+            content: 'true';
+            position: absolute;
+            left: -20px;
+            top: 10px;
+            color: #28a745;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .condition-false {
+            width: 2px;
+            height: 40px;
+            left: 75%;
+            top: 80px;
+        }
+        
+        .condition-false::after {
+            content: 'false';
+            position: absolute;
+            left: 5px;
+            top: 10px;
+            color: #dc3545;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .true-end {
+            width: 2px;
+            height: 40px;
+            left: 25%;
+            top: 180px;
+        }
+        
+        .false-end {
+            width: 2px;
+            height: 40px;
+            left: 75%;
+            top: 180px;
+        }
+        
+        .horizontal-connect {
+            width: 50%;
+            height: 2px;
+            left: 25%;
+            top: 220px;
+        }
+        
+        .active-node {
+            box-shadow: 0 0 0 4px rgba(0, 120, 215, 0.5);
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        .active-arrow {
+            background: #0078D7;
+        }
+        
+        .slider-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0.5rem;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0078D7;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0078D7;
+            cursor: pointer;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .example-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.75rem;
+            border-left: 3px solid #0078D7;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-2">
+            <div class="part-badge">
+                <i class="fas fa-code-branch mr-2"></i>
+                Part 2: C# Functions & Control Flow
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">If-Else Statements</h1>
+            <p class="text-lg text-gray-600">Conditional Logic in C#</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="w-full max-w-5xl">
+            <!-- Interactive Flow Diagram -->
+            <div class="flow-diagram mb-3">
+                <div class="flow-node condition-node" id="conditionNode">
+                    <div class="font-medium">condition</div>
+                </div>
+                <div class="flow-node true-node" id="trueNode">
+                    <div class="font-medium">true block</div>
+                </div>
+                <div class="flow-node false-node" id="falseNode">
+                    <div class="font-medium">else block</div>
+                </div>
+                <div class="flow-node end-node" id="endNode">
+                    <div class="font-medium">continue execution</div>
+                </div>
+                
+                <div class="flow-arrow condition-true" id="arrowTrue"></div>
+                <div class="flow-arrow condition-false" id="arrowFalse"></div>
+                <div class="flow-arrow true-end" id="arrowTrueEnd"></div>
+                <div class="flow-arrow false-end" id="arrowFalseEnd"></div>
+                <div class="flow-arrow horizontal-connect" id="arrowConnect"></div>
+            </div>
+            
+            <!-- Interactive Health Slider -->
+            <div class="slider-container mb-3">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-medium">Player Health:</span>
+                    <span class="text-sm font-medium" id="healthValue">50</span>
+                </div>
+                <input type="range" min="0" max="100" value="50" class="slider" id="healthSlider">
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>0</span>
+                    <span>50</span>
+                    <span>100</span>
+                </div>
+            </div>
+            
+            <!-- Code Example -->
+            <div class="code-block mb-3">
+<span class="keyword">void</span> <span class="method">CheckPlayerHealth</span>()
+{
+    <span class="keyword">if</span> (playerHealth > 50)
+    {
+        <span class="comment">// Health is good</span>
+        <span class="method">SetHealthStatus</span>(<span class="string">"Healthy"</span>);
+        <span class="method">EnableSprinting</span>();
+    }
+    <span class="keyword">else</span>
+    {
+        <span class="comment">// Health is low</span>
+        <span class="method">SetHealthStatus</span>(<span class="string">"Injured"</span>);
+        <span class="method">DisableSprinting</span>();
+    }
+    
+    <span class="comment">// Execution continues here regardless of condition</span>
+    <span class="method">UpdateUI</span>();
+}
+            </div>
+            
+            <!-- Examples Grid -->
+            <div class="example-grid">
+                <div class="example-item">
+                    <h4 class="font-medium mb-1">Basic If Statement</h4>
+                    <div class="code-block text-sm">
+<span class="keyword">if</span> (isGrounded)
+{
+    <span class="method">AllowJump</span>();
+}
+                    </div>
+                </div>
+                
+                <div class="example-item">
+                    <h4 class="font-medium mb-1">If-Else If-Else</h4>
+                    <div class="code-block text-sm">
+<span class="keyword">if</span> (ammo > 10)
+{
+    <span class="method">SetAmmoStatus</span>(<span class="string">"Full"</span>);
+}
+<span class="keyword">else if</span> (ammo > 0)
+{
+    <span class="method">SetAmmoStatus</span>(<span class="string">"Low"</span>);
+}
+<span class="keyword">else</span>
+{
+    <span class="method">SetAmmoStatus</span>(<span class="string">"Empty"</span>);
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Best Practices -->
+        <div class="w-full max-w-5xl mt-2">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg">
+                <h4 class="font-semibold unity-blue mb-1">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Best Practices
+                </h4>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Keep conditions simple and readable</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use braces even for single-line blocks</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Consider early returns for cleaner nesting</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use switch statements for multiple conditions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive health slider
+        const healthSlider = document.getElementById('healthSlider');
+        const healthValue = document.getElementById('healthValue');
+        
+        // Flow diagram nodes and arrows
+        const conditionNode = document.getElementById('conditionNode');
+        const trueNode = document.getElementById('trueNode');
+        const falseNode = document.getElementById('falseNode');
+        const endNode = document.getElementById('endNode');
+        
+        const arrowTrue = document.getElementById('arrowTrue');
+        const arrowFalse = document.getElementById('arrowFalse');
+        const arrowTrueEnd = document.getElementById('arrowTrueEnd');
+        const arrowFalseEnd = document.getElementById('arrowFalseEnd');
+        const arrowConnect = document.getElementById('arrowConnect');
+        
+        // Update flow based on health value
+        function updateFlow(health) {
+            // Reset all active states
+            conditionNode.classList.remove('active-node');
+            trueNode.classList.remove('active-node');
+            falseNode.classList.remove('active-node');
+            endNode.classList.remove('active-node');
+            
+            arrowTrue.classList.remove('active-arrow');
+            arrowFalse.classList.remove('active-arrow');
+            arrowTrueEnd.classList.remove('active-arrow');
+            arrowFalseEnd.classList.remove('active-arrow');
+            arrowConnect.classList.remove('active-arrow');
+            
+            // Highlight condition node
+            conditionNode.classList.add('active-node');
+            
+            // Simulate flow based on health value
+            setTimeout(() => {
+                if (health > 50) {
+                    // True path
+                    arrowTrue.classList.add('active-arrow');
+                    setTimeout(() => {
+                        trueNode.classList.add('active-node');
+                        setTimeout(() => {
+                            arrowTrueEnd.classList.add('active-arrow');
+                            setTimeout(() => {
+                                endNode.classList.add('active-node');
+                            }, 300);
+                        }, 300);
+                    }, 300);
+                } else {
+                    // False path
+                    arrowFalse.classList.add('active-arrow');
+                    setTimeout(() => {
+                        falseNode.classList.add('active-node');
+                        setTimeout(() => {
+                            arrowFalseEnd.classList.add('active-arrow');
+                            setTimeout(() => {
+                                endNode.classList.add('active-node');
+                            }, 300);
+                        }, 300);
+                    }, 300);
+                }
+            }, 300);
+        }
+        
+        // Health slider event
+        healthSlider.addEventListener('input', function() {
+            const health = this.value;
+            healthValue.textContent = health;
+            
+            // Update condition node text
+            conditionNode.innerHTML = `<div class="font-medium">playerHealth > 50</div>
+                                      <div class="text-sm">(${health} > 50)</div>`;
+            
+            // Update flow visualization
+            updateFlow(health);
+        });
+        
+        // Initialize
+        updateFlow(50);
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_13_organizing_code.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_15_switch.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_15_switch.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_13_organizing_code.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 16;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

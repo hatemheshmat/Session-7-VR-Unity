@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fields vs Local Variables</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .scope-visualization {
+            width: 700px;
+            height: 350px;
+            margin: 0 auto;
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            overflow: hidden;
+        }
+        
+        .class-scope {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: rgba(0, 120, 215, 0.1);
+            border: 2px dashed #0078D7;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .method-scope {
+            position: absolute;
+            top: 130px;
+            left: 40px;
+            width: 300px;
+            height: 180px;
+            background: rgba(92, 45, 145, 0.1);
+            border: 2px dashed #5C2D91;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .variable-box {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .variable-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .field {
+            background: #e3f2fd;
+            border-left: 4px solid #0078D7;
+        }
+        
+        .local {
+            background: #f3e5f5;
+            border-left: 4px solid #5C2D91;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th {
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .comparison-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            max-width: 200px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .tooltip.show {
+            opacity: 1;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-2 text-center mx-auto">Fields vs Local Variables</h1>
+            <p class="text-lg text-gray-600">Understanding Variable Scope and Visibility</p>
+        </div>
+        
+        <!-- Interactive Scope Visualization -->
+        <div class="scope-visualization mb-4">
+            <div class="class-scope">
+                <div class="text-lg font-semibold unity-blue mb-2">
+                    <i class="fas fa-cube mr-2"></i>
+                    ScoreDemo Class Scope
+                </div>
+                
+                <div class="variable-box field" data-tooltip="Accessible from any method in this class and from other scripts if public">
+                    <span class="text-blue-600">public int</span> score = 0;
+                </div>
+                
+                <div class="variable-box field" data-tooltip="Only accessible from methods inside this class">
+                    <span class="text-blue-600">private float</span> timeRemaining = 60f;
+                </div>
+                
+                <div class="variable-box field" data-tooltip="Private but visible in Inspector with SerializeField attribute">
+                    [<span class="text-green-600">SerializeField</span>] <span class="text-blue-600">private int</span> pointsPerTarget = 10;
+                </div>
+                
+                <div class="method-scope">
+                    <div class="text-lg font-semibold meta-purple mb-2">
+                        <i class="fas fa-code mr-2"></i>
+                        AddPoints() Method Scope
+                    </div>
+                    
+                    <div class="variable-box local" data-tooltip="Only exists while the method is running">
+                        <span class="text-purple-600">int</span> bonusPoints = 5;
+                    </div>
+                    
+                    <div class="variable-box local" data-tooltip="Parameter variable, only accessible inside this method">
+                        <span class="text-purple-600">int</span> amount
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tooltip" class="tooltip"></div>
+        </div>
+        
+        <!-- Comparison Table -->
+        <div class="w-full max-w-4xl">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th class="w-1/4"></th>
+                        <th class="w-3/8 unity-blue">Fields (Class Variables)</th>
+                        <th class="w-3/8 meta-purple">Local Variables</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-semibold">Lifetime</td>
+                        <td>Entire object lifetime</td>
+                        <td>Only during method execution</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Visibility</td>
+                        <td>Can be public or private</td>
+                        <td>Only within containing method</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Inspector</td>
+                        <td>Visible if public or [SerializeField]</td>
+                        <td>Never visible in Inspector</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Memory</td>
+                        <td>Stored with the GameObject</td>
+                        <td>Temporary stack allocation</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Best Practice Tip -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg mt-4">
+                <h4 class="font-semibold unity-blue mb-1">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Best Practice
+                </h4>
+                <p class="text-sm text-gray-700">
+                    Use fields for data that needs to persist between method calls or be visible in the Inspector.
+                    Use local variables for temporary calculations or method-specific operations.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Add interactivity to variable boxes
+        const variableBoxes = document.querySelectorAll('.variable-box');
+        const tooltip = document.getElementById('tooltip');
+        
+        variableBoxes.forEach(box => {
+            box.addEventListener('mouseenter', function(e) {
+                const tooltipText = this.getAttribute('data-tooltip');
+                if (tooltipText) {
+                    tooltip.textContent = tooltipText;
+                    tooltip.classList.add('show');
+                    
+                    // Position tooltip
+                    const rect = this.getBoundingClientRect();
+                    const containerRect = document.querySelector('.scope-visualization').getBoundingClientRect();
+                    
+                    tooltip.style.left = (rect.left - containerRect.left + rect.width / 2) + 'px';
+                    tooltip.style.top = (rect.bottom - containerRect.top + 10) + 'px';
+                }
+            });
+            
+            box.addEventListener('mouseleave', function() {
+                tooltip.classList.remove('show');
+            });
+            
+            box.addEventListener('click', function() {
+                // Add highlight effect
+                this.style.transform = 'translateY(-2px) scale(1.05)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-2px)';
+                }, 200);
+            });
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_03_variables_101.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_05_numeric_types.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_05_numeric_types.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_03_variables_101.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 6;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

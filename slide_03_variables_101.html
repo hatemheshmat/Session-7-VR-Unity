@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variables 101</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .variable-simulator {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .variable-type-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .type-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            flex: 1;
+            margin: 0 0.25rem;
+        }
+        
+        .type-btn.active {
+            background: #0078D7;
+            color: white;
+        }
+        
+        .type-btn:not(.active) {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .type-btn:hover:not(.active) {
+            background: #dee2e6;
+        }
+        
+        .variable-preview {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        .variable-preview::before {
+            content: 'C# Code';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #0078D7;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        .boolean { color: #569cd6; }
+        
+        .variable-explanation {
+            background: #e3f2fd;
+            border-left: 4px solid #0078D7;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+        }
+        
+        .variable-components {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        
+        .component-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 0.5rem;
+            border: 1px solid #dee2e6;
+        }
+        
+        .component-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #0078D7;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .example-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.75rem;
+            border-left: 3px solid #0078D7;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-2 text-center mx-auto">Variables 101</h1>
+            <p class="text-lg text-gray-600">Type + Name + Value</p>
+        </div>
+        
+        <!-- Variable Simulator -->
+        <div class="variable-simulator mb-4">
+            <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">Variable Declaration Simulator</h3>
+            
+            <div class="variable-type-selector">
+                <div class="type-btn active" data-type="int">int</div>
+                <div class="type-btn" data-type="float">float</div>
+                <div class="type-btn" data-type="bool">bool</div>
+                <div class="type-btn" data-type="string">string</div>
+            </div>
+            
+            <div class="variable-preview" id="codePreview">
+                <span class="keyword">int</span> score = <span class="number">100</span>;
+            </div>
+            
+            <div class="variable-components">
+                <div class="component-item">
+                    <div class="component-title">Type</div>
+                    <div id="typeComponent" class="keyword">int</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-title">Name</div>
+                    <div id="nameComponent">score</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-title">Value</div>
+                    <div id="valueComponent" class="number">100</div>
+                </div>
+            </div>
+            
+            <div class="variable-explanation" id="explanation">
+                <strong>Integer (int):</strong> Whole numbers without decimal points. Used for scores, counters, or any whole number value.
+            </div>
+        </div>
+        
+        <!-- Examples Section -->
+        <div class="w-full max-w-4xl">
+            <h3 class="text-xl font-semibold unity-blue text-center mb-3 text-center mx-auto">Common Variable Types in Unity</h3>
+            
+            <div class="example-grid">
+                <div class="example-item">
+                    <h4 class="font-medium mb-1">Integer (int)</h4>
+                    <code class="text-sm">
+                        <span class="keyword">int</span> playerLives = <span class="number">3</span>;
+                    </code>
+                    <p class="text-sm text-gray-600 mt-1">Whole numbers (no decimals)</p>
+                </div>
+                
+                <div class="example-item">
+                    <h4 class="font-medium mb-1">Float</h4>
+                    <code class="text-sm">
+                        <span class="keyword">float</span> moveSpeed = <span class="number">5.5f</span>;
+                    </code>
+                    <p class="text-sm text-gray-600 mt-1">Decimal numbers (note the 'f' suffix)</p>
+                </div>
+                
+                <div class="example-item">
+                    <h4 class="font-medium mb-1">Boolean (bool)</h4>
+                    <code class="text-sm">
+                        <span class="keyword">bool</span> isGameOver = <span class="boolean">false</span>;
+                    </code>
+                    <p class="text-sm text-gray-600 mt-1">True/false values only</p>
+                </div>
+                
+                <div class="example-item">
+                    <h4 class="font-medium mb-1">String</h4>
+                    <code class="text-sm">
+                        <span class="keyword">string</span> playerName = <span class="string">"VRPlayer"</span>;
+                    </code>
+                    <p class="text-sm text-gray-600 mt-1">Text values in quotes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Variable simulator interactivity
+        const typeBtns = document.querySelectorAll('.type-btn');
+        const codePreview = document.getElementById('codePreview');
+        const typeComponent = document.getElementById('typeComponent');
+        const nameComponent = document.getElementById('nameComponent');
+        const valueComponent = document.getElementById('valueComponent');
+        const explanation = document.getElementById('explanation');
+        
+        // Variable examples by type
+        const variables = {
+            int: {
+                type: 'int',
+                name: 'score',
+                value: '100',
+                valueClass: 'number',
+                explanation: '<strong>Integer (int):</strong> Whole numbers without decimal points. Used for scores, counters, or any whole number value.'
+            },
+            float: {
+                type: 'float',
+                name: 'speed',
+                value: '5.5f',
+                valueClass: 'number',
+                explanation: '<strong>Float:</strong> Numbers with decimal points. Used for precise measurements like speed, position, or time. Note the "f" suffix.'
+            },
+            bool: {
+                type: 'bool',
+                name: 'isActive',
+                value: 'true',
+                valueClass: 'boolean',
+                explanation: '<strong>Boolean (bool):</strong> True/false values only. Used for game states, toggles, or any binary condition.'
+            },
+            string: {
+                type: 'string',
+                name: 'playerName',
+                value: '"Player1"',
+                valueClass: 'string',
+                explanation: '<strong>String:</strong> Text values enclosed in quotes. Used for names, messages, or any text content.'
+            }
+        };
+        
+        // Add click event to type buttons
+        typeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                typeBtns.forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Update variable preview
+                const type = this.getAttribute('data-type');
+                const variable = variables[type];
+                
+                codePreview.innerHTML = `<span class="keyword">${variable.type}</span> ${variable.name} = <span class="${variable.valueClass}">${variable.value}</span>;`;
+                
+                typeComponent.textContent = variable.type;
+                typeComponent.className = 'keyword';
+                
+                nameComponent.textContent = variable.name;
+                
+                valueComponent.textContent = variable.value;
+                valueComponent.className = variable.valueClass;
+                
+                explanation.innerHTML = variable.explanation;
+            });
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_02_csharp_unity.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_04_fields_vs_local.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_04_fields_vs_local.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_02_csharp_unity.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 5;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

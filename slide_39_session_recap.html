@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Recap</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .concept-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .concept-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .concept-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+        
+        .concept-content {
+            flex: 1;
+        }
+        
+        .concept-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 1rem;
+            color: #0078D7;
+        }
+        
+        .concept-description {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .quiz-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 200px;
+        }
+        
+        .quiz-question {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #0078D7;
+            margin-bottom: 0.75rem;
+        }
+        
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-option:hover {
+            background: rgba(0, 120, 215, 0.1);
+        }
+        
+        .quiz-option.selected {
+            background: rgba(0, 120, 215, 0.2);
+        }
+        
+        .quiz-option.correct {
+            background: rgba(40, 167, 69, 0.2);
+        }
+        
+        .quiz-option.incorrect {
+            background: rgba(220, 53, 69, 0.2);
+        }
+        
+        .quiz-option-marker {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #0078D7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-weight: 600;
+            color: #0078D7;
+            font-size: 0.8rem;
+        }
+        
+        .quiz-option.selected .quiz-option-marker,
+        .quiz-option.correct .quiz-option-marker,
+        .quiz-option.incorrect .quiz-option-marker {
+            background: #0078D7;
+            color: white;
+        }
+        
+        .quiz-option.correct .quiz-option-marker {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .quiz-option.incorrect .quiz-option-marker {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .quiz-option-text {
+            font-size: 0.9rem;
+        }
+        
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+        
+        .quiz-feedback.correct {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            display: block;
+        }
+        
+        .quiz-feedback.incorrect {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            display: block;
+        }
+        
+        .next-steps {
+            background: linear-gradient(135deg, rgba(0, 120, 215, 0.1) 0%, rgba(92, 45, 145, 0.1) 100%);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+        
+        .next-steps-title {
+            font-weight: 600;
+            color: #0078D7;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .next-step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .next-step-icon {
+            color: #5C2D91;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        .next-step-text {
+            font-size: 0.85rem;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-graduation-cap mr-2"></i>
+                Session 7 Recap
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">What We've Learned</h1>
+            <p class="text-lg text-gray-600">Key Concepts and Next Steps</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Key Concepts -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Key Concepts
+                </h3>
+                
+                <div class="concept-item">
+                    <div class="concept-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="concept-content">
+                        <div class="concept-title">C# Scripting Fundamentals</div>
+                        <div class="concept-description">Variables, methods, and control flow for creating interactive VR experiences.</div>
+                    </div>
+                </div>
+                
+                <div class="concept-item">
+                    <div class="concept-icon">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="concept-content">
+                        <div class="concept-title">World-Space UI Canvas</div>
+                        <div class="concept-description">Creating and configuring UI elements that exist in 3D space for VR interfaces.</div>
+                    </div>
+                </div>
+                
+                <div class="concept-item">
+                    <div class="concept-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="concept-content">
+                        <div class="concept-title">XR Ray Interactors</div>
+                        <div class="concept-description">Implementing controller rays for distance interaction with objects and UI.</div>
+                    </div>
+                </div>
+                
+                <div class="next-steps mt-3">
+                    <div class="next-steps-title">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Next Steps
+                    </div>
+                    
+                    <div class="next-step-item">
+                        <div class="next-step-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="next-step-text">Complete the Target Practice game with additional features</div>
+                    </div>
+                    
+                    <div class="next-step-item">
+                        <div class="next-step-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="next-step-text">Experiment with different UI layouts and interaction patterns</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Quiz -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-question-circle mr-2"></i>
+                    Test Your Knowledge
+                </h3>
+                
+                <div class="quiz-container">
+                    <div class="quiz-question">
+                        Which component is required to create a controller ray in VR?
+                    </div>
+                    
+                    <div class="quiz-option" data-correct="true">
+                        <div class="quiz-option-marker">A</div>
+                        <div class="quiz-option-text">XR Ray Interactor</div>
+                    </div>
+                    
+                    <div class="quiz-option">
+                        <div class="quiz-option-marker">B</div>
+                        <div class="quiz-option-text">Line Renderer</div>
+                    </div>
+                    
+                    <div class="quiz-option">
+                        <div class="quiz-option-marker">C</div>
+                        <div class="quiz-option-text">Particle System</div>
+                    </div>
+                    
+                    <div class="quiz-feedback" id="quizFeedback"></div>
+                </div>
+                
+                <div class="flex justify-center mt-3">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" id="nextQuestionBtn">
+                        <i class="fas fa-arrow-right mr-1"></i> Next Question
+                    </button>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-3">
+                    <div class="font-semibold unity-blue">Session 8 Preview:</div>
+                    <p class="text-sm">In the next session, we'll explore advanced interaction techniques, custom hand poses, and creating a complete VR mini-game with multiple mechanics.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive quiz
+        const quizOptions = document.querySelectorAll('.quiz-option');
+        const quizFeedback = document.getElementById('quizFeedback');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        
+        // Quiz questions
+        const questions = [
+            {
+                question: "Which component is required to create a controller ray in VR?",
+                options: [
+                    { text: "XR Ray Interactor", correct: true },
+                    { text: "Line Renderer", correct: false },
+                    { text: "Particle System", correct: false }
+                ]
+            },
+            {
+                question: "What canvas render mode should be used for VR UI?",
+                options: [
+                    { text: "Screen Space - Overlay", correct: false },
+                    { text: "Screen Space - Camera", correct: false },
+                    { text: "World Space", correct: true }
+                ]
+            },
+            {
+                question: "Which Unity package provides improved text rendering for UI?",
+                options: [
+                    { text: "UI Extensions", correct: false },
+                    { text: "TextMeshPro", correct: true },
+                    { text: "Text Animator", correct: false }
+                ]
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let answered = false;
+        
+        // Handle option selection
+        quizOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                if (answered) return;
+                
+                // Mark as answered
+                answered = true;
+                
+                // Remove any previous selection
+                quizOptions.forEach(opt => opt.classList.remove('selected', 'correct', 'incorrect'));
+                
+                // Select this option
+                this.classList.add('selected');
+                
+                // Check if correct
+                const isCorrect = this.dataset.correct === "true";
+                
+                // Show feedback
+                if (isCorrect) {
+                    this.classList.add('correct');
+                    quizFeedback.textContent = "Correct! Well done!";
+                    quizFeedback.classList.add('correct');
+                    quizFeedback.classList.remove('incorrect');
+                } else {
+                    this.classList.add('incorrect');
+                    
+                    // Show correct answer
+                    quizOptions.forEach(opt => {
+                        if (opt.dataset.correct === "true") {
+                            opt.classList.add('correct');
+                        }
+                    });
+                    
+                    quizFeedback.textContent = "Incorrect. Try again!";
+                    quizFeedback.classList.add('incorrect');
+                    quizFeedback.classList.remove('correct');
+                }
+            });
+        });
+        
+        // Load next question
+        function loadQuestion(index) {
+            // Reset state
+            answered = false;
+            quizOptions.forEach(opt => opt.classList.remove('selected', 'correct', 'incorrect'));
+            quizFeedback.textContent = "";
+            quizFeedback.classList.remove('correct', 'incorrect');
+            
+            // Get question
+            const question = questions[index];
+            
+            // Update question text
+            document.querySelector('.quiz-question').textContent = question.question;
+            
+            // Update options
+            quizOptions.forEach((option, i) => {
+                if (i < question.options.length) {
+                    option.querySelector('.quiz-option-text').textContent = question.options[i].text;
+                    option.dataset.correct = question.options[i].correct;
+                    option.style.display = 'flex';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        }
+        
+        // Next question button
+        nextQuestionBtn.addEventListener('click', function() {
+            currentQuestion = (currentQuestion + 1) % questions.length;
+            loadQuestion(currentQuestion);
+        });
+        
+        // Initialize with first question
+        loadQuestion(currentQuestion);
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_38_final_project.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_40_resources.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_40_resources.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_38_final_project.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 43;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

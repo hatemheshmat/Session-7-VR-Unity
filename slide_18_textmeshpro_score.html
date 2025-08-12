@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TextMeshPro Score Field</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            position: relative;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .score-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .score-label {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 1rem;
+        }
+        
+        .score-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .score-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .add-btn { background: #28a745; }
+        .subtract-btn { background: #dc3545; }
+        .reset-btn { background: #6c757d; }
+        
+        .score-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .score-animation {
+            animation: scoreUpdate 0.5s ease;
+        }
+        
+        @keyframes scoreUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .setup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .setup-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.8rem;
+        }
+        
+        .step-description {
+            font-size: 0.7rem;
+            color: #666;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-font mr-2"></i>
+                Part 3: UI & Score Canvas
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">TextMeshPro Score Field</h1>
+            <p class="text-lg text-gray-600">High-Quality Text Rendering for VR UI</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Component Setup -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-cogs mr-2"></i>
+                    TextMeshPro Setup Process
+                </h3>
+                
+                <div class="setup-grid">
+                    <div class="setup-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Add Component</div>
+                            <div class="step-description">UI → Text - TextMeshPro</div>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Import Essentials</div>
+                            <div class="step-description">Import TMP Essentials</div>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Configure Properties</div>
+                            <div class="step-description">Set font, size, color</div>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Script Reference</div>
+                            <div class="step-description">Get component in C#</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Score Display -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-trophy mr-2"></i>
+                    Interactive Score Display
+                </h3>
+                
+                <div class="score-display">
+                    <div class="score-label">SCORE</div>
+                    <div class="score-text" id="scoreText">0</div>
+                    
+                    <div class="score-controls">
+                        <button class="score-btn add-btn" id="addBtn">
+                            <i class="fas fa-plus mr-1"></i> +10
+                        </button>
+                        <button class="score-btn subtract-btn" id="subtractBtn">
+                            <i class="fas fa-minus mr-1"></i> -5
+                        </button>
+                        <button class="score-btn reset-btn" id="resetBtn">
+                            <i class="fas fa-redo mr-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Code Examples -->
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <h4 class="font-semibold unity-blue mb-1">Score Manager Script</h4>
+                <div class="code-block">
+<span class="keyword">using</span> UnityEngine;
+<span class="keyword">using</span> TMPro;
+
+<span class="keyword">public class</span> <span class="type">ScoreManager</span> : MonoBehaviour
+{
+    <span class="keyword">public</span> TextMeshProUGUI scoreText;
+    <span class="keyword">private int</span> currentScore = 0;
+    
+    <span class="keyword">public void</span> <span class="method">AddScore</span>(<span class="keyword">int</span> points)
+    {
+        currentScore += points;
+        scoreText.text = <span class="string">$"Score: {currentScore}"</span>;
+    }
+}
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="font-semibold unity-blue mb-1">Rich Text Formatting</h4>
+                <div class="code-block">
+<span class="comment">// Rich text formatting examples</span>
+scoreText.text = <span class="string">"&lt;color=yellow&gt;Score: &lt;/color&gt;"</span> + currentScore;
+
+<span class="comment">// Size and color combined</span>
+scoreText.text = <span class="string">$"&lt;size=150%&gt;&lt;color=gold&gt;{currentScore}&lt;/color&gt;&lt;/size&gt;"</span>;
+
+<span class="comment">// Gradient effects</span>
+scoreText.text = <span class="string">"&lt;gradient=\"Red to Blue\"&gt;SCORE&lt;/gradient&gt;"</span>;
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive score display
+        const scoreText = document.getElementById('scoreText');
+        const addBtn = document.getElementById('addBtn');
+        const subtractBtn = document.getElementById('subtractBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        let currentScore = 0;
+        
+        function updateScore(newScore) {
+            currentScore = newScore;
+            scoreText.textContent = currentScore;
+            
+            // Add animation class
+            scoreText.classList.add('score-animation');
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                scoreText.classList.remove('score-animation');
+            }, 500);
+            
+            // Change color based on score
+            if (currentScore > 50) {
+                scoreText.style.color = '#28a745'; // Green for high scores
+            } else if (currentScore < 0) {
+                scoreText.style.color = '#dc3545'; // Red for negative scores
+            } else {
+                scoreText.style.color = 'white'; // Default white
+            }
+        }
+        
+        addBtn.addEventListener('click', function() {
+            updateScore(currentScore + 10);
+        });
+        
+        subtractBtn.addEventListener('click', function() {
+            updateScore(currentScore - 5);
+        });
+        
+        resetBtn.addEventListener('click', function() {
+            updateScore(0);
+        });
+        
+        // Button hover effects
+        document.querySelectorAll('.score-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_17_ui_canvas.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_19_update_ui_script.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_19_update_ui_script.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_17_ui_canvas.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 21;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

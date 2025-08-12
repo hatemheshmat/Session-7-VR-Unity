@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methods Overview</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .method-anatomy {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        
+        .code-highlight {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .code-highlight:hover {
+            background: rgba(0, 120, 215, 0.2);
+            border-radius: 3px;
+        }
+        
+        .code-highlight.active {
+            background: rgba(0, 120, 215, 0.3);
+            border-radius: 3px;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        
+        .anatomy-explanation {
+            display: none;
+            background: #e3f2fd;
+            border-left: 4px solid #0078D7;
+            padding: 0.75rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 0.5rem;
+            animation: fadeIn 0.3s;
+        }
+        
+        .anatomy-explanation.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .method-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .method-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.75rem;
+            border-left: 4px solid #0078D7;
+            transition: all 0.3s ease;
+        }
+        
+        .method-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-2">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 2: C# Functions & Control Flow
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Methods Overview</h1>
+            <p class="text-lg text-gray-600">Understanding Method Signatures and Call Sites</p>
+        </div>
+        
+        <!-- Method Anatomy Diagram -->
+        <div class="method-anatomy mb-2">
+            <h3 class="text-xl font-semibold unity-blue mb-2 text-center text-center mx-auto">Method Anatomy</h3>
+            
+            <div class="code-block relative" id="methodCode">
+                <div class="absolute -top-3 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">C# Method</div>
+                <span class="keyword code-highlight" data-part="access">private</span> 
+                <span class="keyword code-highlight" data-part="returnType">int</span> 
+                <span class="method code-highlight" data-part="name">CalculateScore</span>
+                <span>(</span>
+                <span class="keyword code-highlight" data-part="paramType">int</span> 
+                <span class="code-highlight" data-part="paramName">basePoints</span>
+                <span>, </span>
+                <span class="keyword code-highlight" data-part="paramType">float</span> 
+                <span class="code-highlight" data-part="paramName">multiplier</span>
+                <span>)</span>
+                <span> {</span><br>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span class="keyword">int</span> finalScore = (<span class="keyword">int</span>)(basePoints * multiplier);<br>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span class="keyword code-highlight" data-part="return">return</span> finalScore;<br>
+                <span>}</span>
+            </div>
+            
+            <!-- Explanations for each part -->
+            <div id="accessExplanation" class="anatomy-explanation">
+                <strong>Access Modifier:</strong> Controls visibility of the method.
+                <div class="grid grid-cols-3 gap-1 text-xs mt-1">
+                    <div><code>public</code> - Accessible from anywhere</div>
+                    <div><code>private</code> - Only within this class</div>
+                    <div><code>protected</code> - This class and derived classes</div>
+                </div>
+            </div>
+            
+            <div id="returnTypeExplanation" class="anatomy-explanation">
+                <strong>Return Type:</strong> The type of data the method returns.
+                <div class="grid grid-cols-3 gap-1 text-xs mt-1">
+                    <div><code>void</code> - Returns nothing</div>
+                    <div><code>int</code>, <code>float</code>, <code>bool</code> - Returns that type</div>
+                    <div><code>GameObject</code>, <code>Transform</code> - Returns Unity objects</div>
+                </div>
+            </div>
+            
+            <div id="nameExplanation" class="anatomy-explanation">
+                <strong>Method Name:</strong> Identifies the method.
+                <div class="grid grid-cols-3 gap-1 text-xs mt-1">
+                    <div>Use PascalCase naming</div>
+                    <div>Descriptive of function</div>
+                    <div>Often starts with a verb</div>
+                </div>
+            </div>
+            
+            <div id="paramTypeExplanation" class="anatomy-explanation">
+                <strong>Parameter Type:</strong> The data type of each parameter.
+                <div class="grid grid-cols-3 gap-1 text-xs mt-1">
+                    <div>Any valid C# type</div>
+                    <div>Multiple parameters possible</div>
+                    <div>Order matters when calling</div>
+                </div>
+            </div>
+            
+            <div id="paramNameExplanation" class="anatomy-explanation">
+                <strong>Parameter Name:</strong> Identifies the parameter within the method.
+                <div class="grid grid-cols-3 gap-1 text-xs mt-1">
+                    <div>Use camelCase naming</div>
+                    <div>Descriptive of purpose</div>
+                    <div>Referenced in method body</div>
+                </div>
+            </div>
+            
+            <div id="returnExplanation" class="anatomy-explanation">
+                <strong>Return Statement:</strong> Sends a value back to the caller.
+                <div class="grid grid-cols-3 gap-1 text-xs mt-1">
+                    <div>Must match return type</div>
+                    <div>Exits method immediately</div>
+                    <div>Not needed for <code>void</code></div>
+                </div>
+            </div>
+            
+            <div class="text-center text-xs text-gray-600 mt-1">
+                Click on different parts of the method to see explanations
+            </div>
+        </div>
+        
+        <!-- Method Types and Call Sites -->
+        <div class="w-full max-w-4xl">
+            <div class="method-grid">
+                <!-- Method Types -->
+                <div class="method-card">
+                    <h4 class="font-semibold unity-blue mb-1">
+                        <i class="fas fa-sitemap mr-2"></i>
+                        Common Method Types
+                    </h4>
+                    <ul class="space-y-0.5 text-sm">
+                        <li><strong>Unity Event Methods:</strong> Start(), Update(), OnTriggerEnter()</li>
+                        <li><strong>Helper Methods:</strong> CalculateDistance(), IsPlayerInRange()</li>
+                        <li><strong>Getter/Setter:</strong> GetHealth(), SetScore()</li>
+                    </ul>
+                </div>
+                
+                <!-- Call Sites -->
+                <div class="method-card">
+                    <h4 class="font-semibold unity-blue mb-1">
+                        <i class="fas fa-phone-alt mr-2"></i>
+                        Method Call Sites
+                    </h4>
+                    <div class="code-block text-sm">
+<span class="keyword">void</span> <span class="method">Update</span>()
+{
+    <span class="comment">// Call from same class</span>
+    <span class="method">CalculateScore</span>(10, 1.5f);
+    
+    <span class="comment">// Call from another class</span>
+    scoreManager.<span class="method">AddPoints</span>(50);
+}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Best Practices -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                <h4 class="font-semibold unity-blue mb-1">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Method Best Practices
+                </h4>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Keep methods short and focused on a single task</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use descriptive names that explain what the method does</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Method anatomy interactivity
+        const codeHighlights = document.querySelectorAll('.code-highlight');
+        const explanations = document.querySelectorAll('.anatomy-explanation');
+        
+        codeHighlights.forEach(highlight => {
+            highlight.addEventListener('click', function() {
+                const part = this.getAttribute('data-part');
+                
+                // Remove active class from all highlights and explanations
+                codeHighlights.forEach(h => h.classList.remove('active'));
+                explanations.forEach(e => e.classList.remove('active'));
+                
+                // Add active class to clicked highlight and corresponding explanation
+                this.classList.add('active');
+                document.getElementById(`${part}Explanation`).classList.add('active');
+            });
+        });
+        
+        // Initialize with first explanation visible
+        document.querySelector('.code-highlight').classList.add('active');
+        document.querySelector('.anatomy-explanation').classList.add('active');
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_10_variables_quiz.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_12_parameters.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_12_parameters.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_10_variables_quiz.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 13;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

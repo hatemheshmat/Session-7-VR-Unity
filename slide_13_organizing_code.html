@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizing Code</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        
+        .folder-structure {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .folder-tree {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .folder-item {
+            padding: 0.25rem 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .folder-item:hover {
+            background: rgba(0, 120, 215, 0.1);
+            border-radius: 4px;
+        }
+        
+        .folder-item.active {
+            background: rgba(0, 120, 215, 0.2);
+            border-radius: 4px;
+        }
+        
+        .folder-icon {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .folder-name {
+            flex: 1;
+        }
+        
+        .folder-children {
+            padding-left: 1.5rem;
+            display: none;
+        }
+        
+        .folder-children.open {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .namespace-diagram {
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            padding: 1rem;
+            position: relative;
+        }
+        
+        .namespace-box {
+            border: 2px solid #0078D7;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            background: rgba(0, 120, 215, 0.05);
+        }
+        
+        .class-box {
+            border: 2px solid #5C2D91;
+            border-radius: 6px;
+            padding: 0.5rem;
+            margin: 0.5rem;
+            background: rgba(92, 45, 145, 0.05);
+            display: inline-block;
+            min-width: 150px;
+        }
+        
+        .script-preview {
+            position: absolute;
+            background: white;
+            border: 2px solid #0078D7;
+            border-radius: 8px;
+            padding: 1rem;
+            width: 350px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 10;
+            animation: fadeIn 0.3s;
+        }
+        
+        .script-preview.show {
+            display: block;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-2">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 2: C# Functions & Control Flow
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Organizing Code</h1>
+            <p class="text-lg text-gray-600">Structure, Namespaces, and Best Practices</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="w-full grid grid-cols-2 gap-4">
+            <!-- Left: Folder Structure -->
+            <div>
+                <h3 class="text-xl font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-folder mr-2"></i>
+                    Script Organization
+                </h3>
+                
+                <div class="folder-structure">
+                    <div class="folder-tree">
+                        <div class="folder-item" data-folder="assets">
+                            <span class="folder-icon"><i class="fas fa-folder-open text-yellow-500"></i></span>
+                            <span class="folder-name">Assets</span>
+                        </div>
+                        
+                        <div class="folder-children open" id="assetsChildren">
+                            <div class="folder-item" data-folder="scripts">
+                                <span class="folder-icon"><i class="fas fa-folder text-yellow-500"></i></span>
+                                <span class="folder-name">Scripts</span>
+                            </div>
+                            
+                            <div class="folder-children" id="scriptsChildren">
+                                <div class="folder-item" data-folder="player">
+                                    <span class="folder-icon"><i class="fas fa-folder text-yellow-500"></i></span>
+                                    <span class="folder-name">Player</span>
+                                </div>
+                                
+                                <div class="folder-children" id="playerChildren">
+                                    <div class="folder-item" data-script="playercontroller">
+                                        <span class="folder-icon"><i class="fas fa-file-code text-blue-500"></i></span>
+                                        <span class="folder-name">PlayerController.cs</span>
+                                    </div>
+                                    <div class="folder-item" data-script="playerinput">
+                                        <span class="folder-icon"><i class="fas fa-file-code text-blue-500"></i></span>
+                                        <span class="folder-name">PlayerInput.cs</span>
+                                    </div>
+                                    <div class="folder-item" data-script="playerhealth">
+                                        <span class="folder-icon"><i class="fas fa-file-code text-blue-500"></i></span>
+                                        <span class="folder-name">PlayerHealth.cs</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="folder-item" data-folder="ui">
+                                    <span class="folder-icon"><i class="fas fa-folder text-yellow-500"></i></span>
+                                    <span class="folder-name">UI</span>
+                                </div>
+                                
+                                <div class="folder-children" id="uiChildren">
+                                    <div class="folder-item" data-script="scoremanager">
+                                        <span class="folder-icon"><i class="fas fa-file-code text-blue-500"></i></span>
+                                        <span class="folder-name">ScoreManager.cs</span>
+                                    </div>
+                                    <div class="folder-item" data-script="healthbar">
+                                        <span class="folder-icon"><i class="fas fa-file-code text-blue-500"></i></span>
+                                        <span class="folder-name">HealthBar.cs</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="folder-item" data-folder="utils">
+                                    <span class="folder-icon"><i class="fas fa-folder text-yellow-500"></i></span>
+                                    <span class="folder-name">Utils</span>
+                                </div>
+                                
+                                <div class="folder-children" id="utilsChildren">
+                                    <div class="folder-item" data-script="singleton">
+                                        <span class="folder-icon"><i class="fas fa-file-code text-blue-500"></i></span>
+                                        <span class="folder-name">Singleton.cs</span>
+                                    </div>
+                                    <div class="folder-item" data-script="objectpool">
+                                        <span class="folder-icon"><i class="fas fa-file-code text-blue-500"></i></span>
+                                        <span class="folder-name">ObjectPool.cs</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="folder-item">
+                                <span class="folder-icon"><i class="fas fa-folder text-yellow-500"></i></span>
+                                <span class="folder-name">Prefabs</span>
+                            </div>
+                            
+                            <div class="folder-item">
+                                <span class="folder-icon"><i class="fas fa-folder text-yellow-500"></i></span>
+                                <span class="folder-name">Scenes</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Script Preview -->
+                    <div class="script-preview" id="scriptPreview">
+                        <div class="text-right mb-2">
+                            <button id="closePreview" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="code-block" id="previewCode"></div>
+                    </div>
+                </div>
+                
+                <div class="text-center text-sm text-gray-600 mt-2">
+                    Click on folders to expand/collapse. Click on scripts to preview.
+                </div>
+            </div>
+            
+            <!-- Right: Namespaces -->
+            <div>
+                <h3 class="text-xl font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-layer-group mr-2"></i>
+                    Namespaces & Classes
+                </h3>
+                
+                <div class="namespace-diagram">
+                    <div class="namespace-box">
+                        <div class="font-semibold mb-1">namespace <span class="unity-blue">TargetPractice</span></div>
+                        
+                        <div class="namespace-box">
+                            <div class="font-semibold mb-1">namespace <span class="unity-blue">TargetPractice.Player</span></div>
+                            
+                            <div class="class-box">
+                                <div class="font-semibold meta-purple">PlayerController</div>
+                                <div class="text-xs text-gray-600">Handles player movement</div>
+                            </div>
+                            
+                            <div class="class-box">
+                                <div class="font-semibold meta-purple">PlayerInput</div>
+                                <div class="text-xs text-gray-600">Processes input events</div>
+                            </div>
+                        </div>
+                        
+                        <div class="namespace-box">
+                            <div class="font-semibold mb-1">namespace <span class="unity-blue">TargetPractice.UI</span></div>
+                            
+                            <div class="class-box">
+                                <div class="font-semibold meta-purple">ScoreManager</div>
+                                <div class="text-xs text-gray-600">Tracks player score</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-block mt-3">
+<span class="keyword">using</span> UnityEngine;
+<span class="keyword">using</span> <span class="type">TargetPractice.UI</span>;
+
+<span class="keyword">namespace</span> <span class="type">TargetPractice.Player</span>
+{
+    <span class="keyword">public class</span> <span class="type">PlayerController</span> : MonoBehaviour
+    {
+        <span class="keyword">private</span> <span class="type">ScoreManager</span> scoreManager;
+        
+        <span class="comment">// Class implementation...</span>
+    }
+}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Best Practices -->
+        <div class="w-full max-w-4xl">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                <h4 class="font-semibold unity-blue mb-1">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Code Organization Best Practices
+                </h4>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Group related scripts in folders (Player, UI, Enemies)</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use namespaces to prevent naming conflicts</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Keep classes focused on a single responsibility</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Create utility classes for reusable functionality</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Folder structure interactivity
+        const folderItems = document.querySelectorAll('.folder-item[data-folder]');
+        const scriptItems = document.querySelectorAll('.folder-item[data-script]');
+        const scriptPreview = document.getElementById('scriptPreview');
+        const previewCode = document.getElementById('previewCode');
+        const closePreview = document.getElementById('closePreview');
+        
+        // Sample script previews
+        const scriptPreviews = {
+            playercontroller: `<span class="keyword">using</span> UnityEngine;
+<span class="keyword">using</span> <span class="type">TargetPractice.UI</span>;
+
+<span class="keyword">namespace</span> <span class="type">TargetPractice.Player</span>
+{
+    <span class="keyword">public class</span> <span class="type">PlayerController</span> : MonoBehaviour
+    {
+        <span class="keyword">public float</span> moveSpeed = 5f;
+        <span class="keyword">private</span> <span class="type">ScoreManager</span> scoreManager;
+        
+        <span class="keyword">void</span> <span class="method">Start</span>()
+        {
+            scoreManager = <span class="method">FindObjectOfType</span><<span class="type">ScoreManager</span>>();
+        }
+        
+        <span class="comment">// More implementation...</span>
+    }
+}`,
+            playerinput: `<span class="keyword">using</span> UnityEngine;
+<span class="keyword">using</span> UnityEngine.InputSystem;
+
+<span class="keyword">namespace</span> <span class="type">TargetPractice.Player</span>
+{
+    <span class="keyword">public class</span> <span class="type">PlayerInput</span> : MonoBehaviour
+    {
+        <span class="keyword">public</span> Vector2 moveInput;
+        <span class="keyword">public</span> <span class="keyword">bool</span> isFiring;
+        
+        <span class="keyword">public void</span> <span class="method">OnMove</span>(InputAction.CallbackContext context)
+        {
+            moveInput = context.<span class="method">ReadValue</span><Vector2>();
+        }
+        
+        <span class="comment">// More implementation...</span>
+    }
+}`,
+            scoremanager: `<span class="keyword">using</span> UnityEngine;
+<span class="keyword">using</span> TMPro;
+
+<span class="keyword">namespace</span> <span class="type">TargetPractice.UI</span>
+{
+    <span class="keyword">public class</span> <span class="type">ScoreManager</span> : MonoBehaviour
+    {
+        <span class="keyword">public</span> TextMeshProUGUI scoreText;
+        <span class="keyword">private int</span> currentScore = 0;
+        
+        <span class="keyword">public void</span> <span class="method">AddPoints</span>(<span class="keyword">int</span> points)
+        {
+            currentScore += points;
+            scoreText.text = <span class="string">$"Score: {currentScore}"</span>;
+        }
+    }
+}`,
+            singleton: `<span class="keyword">using</span> UnityEngine;
+
+<span class="keyword">namespace</span> <span class="type">TargetPractice.Utils</span>
+{
+    <span class="keyword">public class</span> <span class="type">Singleton</span><<span class="type">T</span>> : MonoBehaviour <span class="keyword">where</span> <span class="type">T</span> : MonoBehaviour
+    {
+        <span class="keyword">private static</span> <span class="type">T</span> instance;
+        
+        <span class="keyword">public static</span> <span class="type">T</span> Instance
+        {
+            <span class="keyword">get</span>
+            {
+                <span class="keyword">if</span> (instance == <span class="keyword">null</span>)
+                {
+                    instance = <span class="method">FindObjectOfType</span><<span class="type">T</span>>();
+                }
+                <span class="keyword">return</span> instance;
+            }
+        }
+    }
+}`
+        };
+        
+        // Toggle folder open/closed
+        folderItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const folderName = this.getAttribute('data-folder');
+                const childrenContainer = document.getElementById(`${folderName}Children`);
+                
+                if (childrenContainer) {
+                    childrenContainer.classList.toggle('open');
+                    
+                    // Update folder icon
+                    const icon = this.querySelector('.folder-icon i');
+                    if (childrenContainer.classList.contains('open')) {
+                        icon.classList.remove('fa-folder');
+                        icon.classList.add('fa-folder-open');
+                    } else {
+                        icon.classList.remove('fa-folder-open');
+                        icon.classList.add('fa-folder');
+                    }
+                }
+            });
+        });
+        
+        // Show script preview
+        scriptItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const scriptName = this.getAttribute('data-script');
+                const scriptContent = scriptPreviews[scriptName] || '<span class="comment">// Script content not available</span>';
+                
+                previewCode.innerHTML = scriptContent;
+                
+                // Position the preview
+                const rect = this.getBoundingClientRect();
+                scriptPreview.style.top = `${rect.top}px`;
+                scriptPreview.style.left = `${rect.right + 10}px`;
+                
+                scriptPreview.classList.add('show');
+                
+                // Highlight the selected script
+                scriptItems.forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Close preview
+        closePreview.addEventListener('click', function() {
+            scriptPreview.classList.remove('show');
+            scriptItems.forEach(s => s.classList.remove('active'));
+        });
+        
+        // Initialize with Scripts folder open
+        document.querySelector('.folder-item[data-folder="scripts"]').click();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_12_parameters.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_14_if_else.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_14_if_else.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_12_parameters.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 15;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

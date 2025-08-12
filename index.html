@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 7: C# Scripting & UI in VR</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/responsive-slides-fixed.css">
+    <link rel="stylesheet" href="css/responsive-footer-fixed.css">
+    <link rel="stylesheet" href="css/notes-panel-fixed.css">
+    <link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+    <style>
+        .presentation-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .slide-selector {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 5px 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .slide-selector.active {
+            display: block;
+        }
+        
+        .slide-selector select {
+            border: none;
+            background: transparent;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: #333;
+            padding: 5px;
+            outline: none;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 120, 215, 0.2);
+            border-top: 5px solid #0078D7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Dark theme for index */
+        body.dark-theme .loading-overlay {
+            background-color: rgba(18, 18, 18, 0.9);
+            color: #e0e0e0;
+        }
+        
+        body.dark-theme .slide-selector {
+            background-color: rgba(30, 30, 30, 0.8);
+        }
+        
+        body.dark-theme .slide-selector select {
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Loading presentation...</p>
+    </div>
+
+    <div class="presentation-container">
+        <iframe id="slideFrame" src="slide_00_cover.html" allowfullscreen></iframe>
+        
+        <div class="slide-selector" id="slideSelector">
+            <select id="slideSelect">
+                <option value="slide_00_cover.html">1. Cover</option>
+                <option value="slide_00_agenda.html">2. Agenda</option>
+                <option value="slide_01_script_intro.html">3. C# Script Introduction</option>
+                <option value="slide_02_csharp_unity.html">4. C# in Unity</option>
+                <option value="slide_03_variables_101.html">5. Variables 101</option>
+                <option value="slide_04_fields_vs_local.html">6. Fields vs Local Variables</option>
+                <option value="slide_05_numeric_types.html">7. Numeric Types</option>
+                <option value="slide_06_strings.html">8. Strings</option>
+                <option value="slide_07_booleans.html">9. Booleans</option>
+                <option value="slide_08_inspector.html">10. Inspector Integration</option>
+                <option value="slide_09_script_test.html">11. Script Testing</option>
+                <option value="slide_10_variables_quiz.html">12. Variables Quiz</option>
+                <option value="slide_11_methods.html">13. Methods</option>
+                <option value="slide_12_parameters.html">14. Parameters</option>
+                <option value="slide_13_organizing_code.html">15. Organizing Code</option>
+                <option value="slide_14_if_else.html">16. If/Else Statements</option>
+                <option value="slide_15_switch.html">17. Switch Statements</option>
+                <option value="slide_16_loops.html">18. Loops</option>
+                <option value="slide_16_break.html">19. Break</option>
+                <option value="slide_17_ui_canvas.html">20. UI Canvas</option>
+                <option value="slide_18_textmeshpro_score.html">21. TextMeshPro Score</option>
+                <option value="slide_19_update_ui_script.html">22. Update UI Script</option>
+                <option value="slide_20_anchor_canvas.html">23. Anchor Canvas</option>
+                <option value="slide_21_worldspace_canvas.html">24. World-Space Canvas</option>
+                <option value="slide_22_create_worldspace_canvas.html">25. Create World-Space Canvas</option>
+                <option value="slide_23_add_tmp_package.html">26. Add TMP Package</option>
+                <option value="slide_24_add_tmp_text.html">27. Add TMP Text</option>
+                <option value="slide_25_anchor_canvas.html">28. Anchor Canvas to XR Rig</option>
+                <option value="slide_26_update_ui_script.html">29. Update UI Script</option>
+                <option value="slide_27_target_practice.html">30. Target Practice</option>
+                <option value="slide_28_performance_tips.html">31. Performance Tips</option>
+                <option value="slide_29_handson_live_score.html">32. Hands-on: Live Score</option>
+                <option value="slide_30_ui_recap_quiz.html">33. UI Recap Quiz</option>
+                <option value="slide_30_break.html">34. Break</option>
+                <option value="slide_31_hook_score_to_hits.html">35. Hook Score to Hits</option>
+                <option value="slide_32_scoremanager_prefab.html">36. ScoreManager Prefab</option>
+                <option value="slide_33_target_prefab_fields.html">37. Target Prefab Fields</option>
+                <option value="slide_34_target_spawning.html">38. Target Spawning</option>
+                <option value="slide_35_game_timer.html">39. Game Timer</option>
+                <option value="slide_36_game_manager.html">40. Game Manager</option>
+                <option value="slide_37_game_ui_panels.html">41. Game UI Panels</option>
+                <option value="slide_38_final_project.html">42. Final Project</option>
+                <option value="slide_39_session_recap.html">43. Session Recap</option>
+                <option value="slide_40_resources.html">44. Resources</option>
+                <option value="slide_40_thank_you.html">45. Thank You</option>
+            </select>
+        </div>
+    </div>
+    
+    <script>
+        // Define all slides in order
+        const slides = [
+            'slide_00_cover.html',
+            'slide_00_agenda.html',
+            'slide_01_script_intro.html',
+            'slide_02_csharp_unity.html',
+            'slide_03_variables_101.html',
+            'slide_04_fields_vs_local.html',
+            'slide_05_numeric_types.html',
+            'slide_06_strings.html',
+            'slide_07_booleans.html',
+            'slide_08_inspector.html',
+            'slide_09_script_test.html',
+            'slide_10_variables_quiz.html',
+            'slide_11_methods.html',
+            'slide_12_parameters.html',
+            'slide_13_organizing_code.html',
+            'slide_14_if_else.html',
+            'slide_15_switch.html',
+            'slide_16_loops.html',
+            'slide_16_break.html',
+            'slide_17_ui_canvas.html',
+            'slide_18_textmeshpro_score.html',
+            'slide_19_update_ui_script.html',
+            'slide_20_anchor_canvas.html',
+            'slide_21_worldspace_canvas.html',
+            'slide_22_create_worldspace_canvas.html',
+            'slide_23_add_tmp_package.html',
+            'slide_24_add_tmp_text.html',
+            'slide_25_anchor_canvas.html',
+            'slide_26_update_ui_script.html',
+            'slide_27_target_practice.html',
+            'slide_28_performance_tips.html',
+            'slide_29_handson_live_score.html',
+            'slide_30_ui_recap_quiz.html',
+            'slide_30_break.html',
+            'slide_31_hook_score_to_hits.html',
+            'slide_32_scoremanager_prefab.html',
+            'slide_33_target_prefab_fields.html',
+            'slide_34_target_spawning.html',
+            'slide_35_game_timer.html',
+            'slide_36_game_manager.html',
+            'slide_37_game_ui_panels.html',
+            'slide_38_final_project.html',
+            'slide_39_session_recap.html',
+            'slide_40_resources.html',
+            'slide_40_thank_you.html'
+        ];
+        
+        // Get DOM elements
+        const slideFrame = document.getElementById('slideFrame');
+        const slideSelector = document.getElementById('slideSelector');
+        const slideSelect = document.getElementById('slideSelect');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        // Current slide index
+        let currentIndex = 0;
+        
+        // Hide loading overlay when iframe loads
+        slideFrame.addEventListener('load', function() {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 500);
+        });
+        
+        // Show loading overlay when changing slides
+        function showLoading() {
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.style.opacity = '1';
+        }
+        
+        // Update slide
+        function updateSlide() {
+            showLoading();
+            slideFrame.src = slides[currentIndex];
+            
+            // Update select dropdown
+            slideSelect.value = slides[currentIndex];
+        }
+        
+        // Navigation functions
+        function goToNextSlide() {
+            if (currentIndex < slides.length - 1) {
+                currentIndex++;
+                updateSlide();
+            }
+        }
+        
+        function goToPrevSlide() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateSlide();
+            }
+        }
+        
+        function goToSlide(index) {
+            if (index >= 0 && index < slides.length) {
+                currentIndex = index;
+                updateSlide();
+            }
+        }
+        
+        // Toggle slide selector
+        function toggleMenu() {
+            slideSelector.classList.toggle('active');
+        }
+        
+        // Event listeners
+        slideSelect.addEventListener('change', function() {
+            const selectedSlide = this.value;
+            const index = slides.indexOf(selectedSlide);
+            if (index !== -1) {
+                goToSlide(index);
+            }
+            slideSelector.classList.remove('active');
+        });
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            // M key to toggle menu
+            if (e.key === 'M' || e.key === 'm') {
+                toggleMenu();
+            }
+        });
+        
+        // Listen for messages from slides
+        window.addEventListener('message', function(event) {
+            if (event.data.action === 'navigate') {
+                if (event.data.direction === 'next') {
+                    goToNextSlide();
+                } else if (event.data.direction === 'prev') {
+                    goToPrevSlide();
+                } else if (event.data.direction === 'home') {
+                    goToSlide(0);
+                }
+            } else if (event.data.action === 'toggleMenu') {
+                toggleMenu();
+            } else if (event.data.action === 'toggleTheme') {
+                document.body.classList.toggle('dark-theme');
+            }
+        });
+        
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
+

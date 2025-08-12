@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Recap Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quiz-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .quiz-header {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .quiz-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .quiz-score {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .quiz-content {
+            padding: 1rem;
+        }
+        
+        .quiz-question {
+            margin-bottom: 1rem;
+        }
+        
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #0078D7;
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .question-text {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .answer-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .answer-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .answer-option:hover {
+            border-color: #0078D7;
+            background: #f0f7ff;
+        }
+        
+        .answer-option.selected {
+            border-color: #0078D7;
+            background: #f0f7ff;
+        }
+        
+        .answer-option.correct {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+        
+        .answer-option.incorrect {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .answer-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: #e2e8f0;
+            color: #4a5568;
+            border-radius: 50%;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            font-size: 0.7rem;
+            transition: all 0.2s ease;
+        }
+        
+        .selected .answer-letter,
+        .answer-option:hover .answer-letter {
+            background: #0078D7;
+            color: white;
+        }
+        
+        .correct .answer-letter {
+            background: #28a745;
+            color: white;
+        }
+        
+        .incorrect .answer-letter {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .answer-text {
+            font-size: 0.85rem;
+        }
+        
+        .answer-icon {
+            margin-left: auto;
+            font-size: 1rem;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .correct .answer-icon {
+            color: #28a745;
+            opacity: 1;
+        }
+        
+        .incorrect .answer-icon {
+            color: #dc3545;
+            opacity: 1;
+        }
+        
+        .quiz-footer {
+            display: flex;
+            justify-content: center;
+            padding: 0.75rem;
+            border-top: 1px solid #e2e8f0;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+<link rel="stylesheet" href="css/quiz-fixed.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-question-circle mr-2"></i>
+                Part 3: UI & Score Canvas
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">UI Recap Quiz</h1>
+            <p class="text-lg text-gray-600">Test Your Knowledge on UI Implementation</p>
+        </div>
+        
+        <!-- Quiz Container -->
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <div class="quiz-title">
+                    <i class="fas fa-clipboard-check mr-2"></i>
+                    UI & Canvas Knowledge Check
+                </div>
+                <div class="quiz-score" id="quizScore">Score: 0/3</div>
+            </div>
+            
+            <div class="quiz-content">
+                <!-- Question 1 -->
+                <div class="quiz-question" id="question1">
+                    <div class="question-text">
+                        <span class="question-number">1</span>
+                        Which Canvas Render Mode should be used for VR UI elements?
+                    </div>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false" onclick="selectAnswer(this, 1)">
+                            <span class="answer-letter">A</span>
+                            <span class="answer-text">Screen Space - Overlay</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                        <div class="answer-option" data-correct="false" onclick="selectAnswer(this, 1)">
+                            <span class="answer-letter">B</span>
+                            <span class="answer-text">Screen Space - Camera</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                        <div class="answer-option" data-correct="true" onclick="selectAnswer(this, 1)">
+                            <span class="answer-letter">C</span>
+                            <span class="answer-text">World Space</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Question 2 -->
+                <div class="quiz-question" id="question2">
+                    <div class="question-text">
+                        <span class="question-number">2</span>
+                        What component should be used for text elements in modern Unity UI?
+                    </div>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false" onclick="selectAnswer(this, 2)">
+                            <span class="answer-letter">A</span>
+                            <span class="answer-text">Legacy Text</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                        <div class="answer-option" data-correct="true" onclick="selectAnswer(this, 2)">
+                            <span class="answer-letter">B</span>
+                            <span class="answer-text">TextMeshPro - Text (UI)</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                        <div class="answer-option" data-correct="false" onclick="selectAnswer(this, 2)">
+                            <span class="answer-letter">C</span>
+                            <span class="answer-text">3D Text</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Question 3 -->
+                <div class="quiz-question" id="question3">
+                    <div class="question-text">
+                        <span class="question-number">3</span>
+                        How do you reference a TextMeshPro component in a C# script?
+                    </div>
+                    <div class="answer-options">
+                        <div class="answer-option" data-correct="false" onclick="selectAnswer(this, 3)">
+                            <span class="answer-letter">A</span>
+                            <span class="answer-text">Using Text from UnityEngine.UI</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                        <div class="answer-option" data-correct="true" onclick="selectAnswer(this, 3)">
+                            <span class="answer-letter">B</span>
+                            <span class="answer-text">Using TMP_Text from TMPro</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                        <div class="answer-option" data-correct="false" onclick="selectAnswer(this, 3)">
+                            <span class="answer-letter">C</span>
+                            <span class="answer-text">Using GameObject.Find()</span>
+                            <i class="answer-icon fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quiz-footer">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm" id="resetBtn">
+                    <i class="fas fa-redo-alt mr-1"></i>
+                    Reset Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Quiz functionality
+        const quizScore = document.getElementById('quizScore');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        let score = 0;
+        let answered = [false, false, false];
+        
+        function selectAnswer(element, questionNumber) {
+            // If already answered, do nothing
+            if (answered[questionNumber - 1]) return;
+            
+            // Mark as answered
+            answered[questionNumber - 1] = true;
+            
+            // Get all options for this question
+            const questionElement = document.getElementById(`question${questionNumber}`);
+            const options = questionElement.querySelectorAll('.answer-option');
+            
+            // Remove hover effect from all options
+            options.forEach(option => {
+                option.classList.add('pointer-events-none');
+            });
+            
+            // Check if correct
+            const isCorrect = element.getAttribute('data-correct') === 'true';
+            
+            if (isCorrect) {
+                // Correct answer
+                element.classList.add('correct');
+                score++;
+            } else {
+                // Incorrect answer
+                element.classList.add('incorrect');
+                
+                // Show correct answer
+                options.forEach(option => {
+                    if (option.getAttribute('data-correct') === 'true') {
+                        option.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Update score
+            quizScore.textContent = `Score: ${score}/3`;
+        }
+        
+        // Reset quiz
+        resetBtn.addEventListener('click', function() {
+            // Reset score
+            score = 0;
+            answered = [false, false, false];
+            quizScore.textContent = 'Score: 0/3';
+            
+            // Reset all questions
+            for (let i = 1; i <= 3; i++) {
+                const questionElement = document.getElementById(`question${i}`);
+                const options = questionElement.querySelectorAll('.answer-option');
+                
+                options.forEach(option => {
+                    option.classList.remove('selected', 'correct', 'incorrect', 'pointer-events-none');
+                });
+            }
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_29_handson_live_score.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_30_break.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_30_break.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_29_handson_live_score.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 33;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+<script src="js/quiz-fixed.js"></script>
+</body>
+</html>
+

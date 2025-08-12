@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Spawning</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow: auto;
+            max-height: 140px;
+        }
+        
+        .code-comment { color: #6A9955; }
+        .code-keyword { color: #569CD6; }
+        .code-string { color: #CE9178; }
+        .code-method { color: #DCDCAA; }
+        .code-type { color: #4EC9B0; }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .spawn-visualization {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .spawn-area {
+            position: absolute;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+        }
+        
+        .target {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, white 0%, white 30%, red 30%, red 60%, white 60%, white 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .target.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .target.hit {
+            background: radial-gradient(circle, #0078D7 0%, #0078D7 30%, #5C2D91 30%, #5C2D91 60%, #0078D7 60%, #0078D7 100%);
+            color: white;
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+        
+        .spawn-point {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(0);
+            opacity: 0;
+        }
+        
+        .spawn-point.active {
+            animation: pulse 1s ease-out;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-cube mr-2"></i>
+                Part 4: Target Practice Game
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Target Spawning</h1>
+            <p class="text-lg text-gray-600">Dynamically Creating Targets at Runtime</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Spawning Code -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-code mr-2"></i>
+                    Target Spawner Implementation
+                </h3>
+                
+                <p class="text-sm mb-2">Create a TargetSpawner script to dynamically instantiate target prefabs at random positions within a defined spawn area.</p>
+                
+                <div class="code-block">
+<span class="code-keyword">using</span> UnityEngine;
+<span class="code-keyword">using</span> System.Collections;
+
+<span class="code-keyword">public class</span> <span class="code-type">TargetSpawner</span> : MonoBehaviour
+{
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">GameObject</span>[] targetPrefabs;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">Transform</span> spawnAreaMin;
+    [SerializeField] <span class="code-keyword">private</span> <span class="code-type">Transform</span> spawnAreaMax;
+    [SerializeField] <span class="code-keyword">private float</span> spawnInterval = 2.0f;
+    [SerializeField] <span class="code-keyword">private int</span> maxTargets = 5;
+    
+    <span class="code-keyword">private int</span> activeTargets = 0;
+    
+    <span class="code-keyword">void</span> <span class="code-method">Start</span>()
+    {
+        StartCoroutine(<span class="code-method">SpawnTargets</span>());
+    }
+    
+    <span class="code-keyword">private</span> <span class="code-type">IEnumerator</span> <span class="code-method">SpawnTargets</span>()
+    {
+        <span class="code-keyword">while</span> (<span class="code-keyword">true</span>)
+        {
+            <span class="code-keyword">if</span> (activeTargets < maxTargets)
+            {
+                <span class="code-method">SpawnTarget</span>();
+                activeTargets++;
+            }
+            <span class="code-keyword">yield return new</span> <span class="code-type">WaitForSeconds</span>(spawnInterval);
+        }
+    }
+}
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Define Spawn Area</div>
+                            <div class="step-description">Set min/max bounds</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Create Target Array</div>
+                            <div class="step-description">Different point values</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Implement Coroutine</div>
+                            <div class="step-description">Timed spawning</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Track Active Targets</div>
+                            <div class="step-description">Limit maximum count</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <p class="text-sm"><span class="font-semibold unity-blue">Key Method:</span> Use <code class="bg-white px-1 py-0.5 rounded">GetRandomSpawnPosition()</code> to calculate random positions within the defined spawn area bounds.</p>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Visualization -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-magic mr-2"></i>
+                    Spawn Visualization
+                </h3>
+                
+                <div class="spawn-visualization" id="spawnVisualization">
+                    <div class="spawn-area"></div>
+                    <!-- Targets will be added dynamically -->
+                </div>
+                
+                <div class="flex justify-center mt-3">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" id="spawnBtn">
+                        <i class="fas fa-plus-circle mr-1"></i> Spawn Target
+                    </button>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <div class="font-semibold unity-blue">Best Practice:</div>
+                    <p class="text-sm">Use events to notify the spawner when targets are destroyed, allowing it to maintain an accurate count of active targets.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive spawn visualization
+        const spawnVisualization = document.getElementById('spawnVisualization');
+        const spawnBtn = document.getElementById('spawnBtn');
+        const spawnArea = document.querySelector('.spawn-area');
+        
+        let targetCount = 0;
+        const maxTargets = 5;
+        const targetValues = [10, 20, 30, 50];
+        const targets = [];
+        
+        // Spawn a new target
+        spawnBtn.addEventListener('click', function() {
+            if (targetCount < maxTargets) {
+                spawnTarget();
+            } else {
+                // Shake button to indicate max reached
+                this.classList.add('animate-pulse');
+                setTimeout(() => {
+                    this.classList.remove('animate-pulse');
+                }, 500);
+            }
+        });
+        
+        function spawnTarget() {
+            // Get spawn area dimensions
+            const areaRect = spawnArea.getBoundingClientRect();
+            const visualizationRect = spawnVisualization.getBoundingClientRect();
+            
+            // Calculate random position within spawn area
+            const minX = areaRect.left - visualizationRect.left + 20;
+            const maxX = areaRect.right - visualizationRect.left - 20;
+            const minY = areaRect.top - visualizationRect.top + 20;
+            const maxY = areaRect.bottom - visualizationRect.top - 20;
+            
+            const x = Math.random() * (maxX - minX) + minX;
+            const y = Math.random() * (maxY - minY) + minY;
+            
+            // Create spawn point effect
+            const spawnPoint = document.createElement('div');
+            spawnPoint.className = 'spawn-point';
+            spawnPoint.style.left = `${x}px`;
+            spawnPoint.style.top = `${y}px`;
+            spawnVisualization.appendChild(spawnPoint);
+            
+            // Animate spawn point
+            setTimeout(() => {
+                spawnPoint.classList.add('active');
+            }, 10);
+            
+            // Create target after delay
+            setTimeout(() => {
+                // Remove spawn point
+                spawnVisualization.removeChild(spawnPoint);
+                
+                // Create target
+                const target = document.createElement('div');
+                target.className = 'target';
+                target.style.left = `${x - 20}px`;
+                target.style.top = `${y - 20}px`;
+                
+                // Set random point value
+                const valueIndex = Math.floor(Math.random() * targetValues.length);
+                const pointValue = targetValues[valueIndex];
+                target.textContent = pointValue;
+                
+                // Add to visualization
+                spawnVisualization.appendChild(target);
+                targets.push(target);
+                targetCount++;
+                
+                // Show target with animation
+                setTimeout(() => {
+                    target.classList.add('active');
+                }, 10);
+                
+                // Add click handler to "destroy" target
+                target.addEventListener('click', function() {
+                    this.classList.add('hit');
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        spawnVisualization.removeChild(this);
+                        targets.splice(targets.indexOf(this), 1);
+                        targetCount--;
+                    }, 1000);
+                });
+            }, 500);
+        }
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_33_target_prefab_fields.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_35_game_timer.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_35_game_timer.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_33_target_prefab_fields.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 38;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspector Exposure</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .inspector-mockup {
+            background: #383838;
+            border-radius: 8px;
+            width: 400px;
+            padding: 1rem;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .inspector-header {
+            background: #4d4d4d;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .inspector-component {
+            background: #2a2a2a;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .inspector-field {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #4d4d4d;
+        }
+        
+        .inspector-field:last-child {
+            border-bottom: none;
+        }
+        
+        .inspector-label {
+            font-size: 0.9rem;
+        }
+        
+        .inspector-input {
+            background: #1e1e1e;
+            border: 1px solid #555;
+            color: #e0e0e0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            width: 80px;
+            text-align: right;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .inspector-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #0078D7;
+        }
+        
+        .code-snippet {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .attribute { color: #b8d7a3; }
+        .type { color: #4ec9b0; }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .comparison-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            max-width: 200px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div class="part-badge">
+                <i class="fas fa-code mr-2"></i>
+                Part 1: C# Scripting Fundamentals
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-2 text-center mx-auto">Inspector Exposure</h1>
+            <p class="text-lg text-gray-600">Tuning Values in the Unity Inspector</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-6 w-full max-w-5xl">
+            <!-- Left: Code and Explanation -->
+            <div>
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">
+                    <i class="fas fa-eye mr-2"></i>
+                    Exposing Variables to Inspector
+                </h3>
+                
+                <div class="code-snippet mb-4">
+<span class="keyword">public class</span> <span class="type">ScoreManager</span> : <span class="type">MonoBehaviour</span>
+{
+    <span class="comment">// Public - visible in Inspector</span>
+    <span class="keyword">public int</span> scorePerTarget = 10;
+    
+    <span class="comment">// Private - NOT visible in Inspector</span>
+    <span class="keyword">private int</span> currentScore = 0;
+    
+    <span class="comment">// Private BUT visible in Inspector</span>
+    [<span class="attribute">SerializeField</span>]
+    <span class="keyword">private float</span> timeLimit = 60f;
+    
+    <span class="comment">// Public BUT hidden from Inspector</span>
+    [<span class="attribute">HideInInspector</span>]
+    <span class="keyword">public bool</span> isGameActive = true;
+}
+                </div>
+                
+                <div class="mb-4">
+                    <h4 class="font-semibold mb-2">Why Expose Variables?</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start">
+                            <i class="fas fa-sliders-h text-green-500 mt-1 mr-2"></i>
+                            <span>Tune game values without changing code</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-users text-green-500 mt-1 mr-2"></i>
+                            <span>Allow designers to adjust values without coding</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-gamepad text-green-500 mt-1 mr-2"></i>
+                            <span>Quickly test different gameplay settings</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-save text-green-500 mt-1 mr-2"></i>
+                            <span>Values are saved with the scene or prefab</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <table class="comparison-table text-sm">
+                    <thead>
+                        <tr>
+                            <th>Approach</th>
+                            <th>Visibility</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>public</code></td>
+                            <td>Inspector + Other scripts</td>
+                            <td>Read/Write from anywhere</td>
+                        </tr>
+                        <tr>
+                            <td><code>[SerializeField] private</code></td>
+                            <td>Inspector only</td>
+                            <td>Read/Write only in this class</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Right: Interactive Inspector Mockup -->
+            <div>
+                <h3 class="text-xl font-semibold unity-blue mb-3 text-center mx-auto">
+                    <i class="fas fa-tools mr-2"></i>
+                    Interactive Inspector Mockup
+                </h3>
+                
+                <div class="inspector-mockup mx-auto">
+                    <div class="inspector-header">
+                        <i class="fas fa-cube mr-2"></i>
+                        <span class="font-bold">ScoreManager (Script)</span>
+                    </div>
+                    
+                    <div class="inspector-component">
+                        <div class="text-sm mb-2">Script Variables</div>
+                        
+                        <div class="inspector-field">
+                            <div class="inspector-label">Score Per Target</div>
+                            <input type="number" id="scorePerTarget" class="inspector-input" value="10" min="1" max="100">
+                        </div>
+                        
+                        <div class="inspector-field">
+                            <div class="inspector-label">Time Limit</div>
+                            <input type="number" id="timeLimit" class="inspector-input" value="60" min="10" max="300" step="5">
+                        </div>
+                        
+                        <div class="inspector-field hidden-field" style="opacity: 0.5;">
+                            <div class="inspector-label">Current Score</div>
+                            <div class="text-xs italic">(Not visible in Inspector)</div>
+                        </div>
+                        
+                        <div class="inspector-field hidden-field" style="opacity: 0.5;">
+                            <div class="inspector-label">Is Game Active</div>
+                            <div class="text-xs italic">(Hidden with HideInInspector)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="inspector-component">
+                        <div class="text-sm mb-2">Preview</div>
+                        <div class="text-center py-2">
+                            <div class="text-2xl font-bold" id="previewScore">0</div>
+                            <div class="text-sm">points</div>
+                        </div>
+                        <div class="w-full bg-gray-700 h-2 rounded-full mt-2">
+                            <div id="previewTimer" class="bg-blue-500 h-2 rounded-full" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <button id="simulateBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition">
+                        <i class="fas fa-play mr-1"></i> Simulate Game
+                    </button>
+                    <button id="resetBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition ml-2">
+                        <i class="fas fa-redo mr-1"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Best Practices -->
+        <div class="w-full max-w-5xl mt-4">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
+                <h4 class="font-semibold unity-blue mb-2">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Best Practices
+                </h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use <code>[SerializeField] private</code> for better encapsulation</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Add tooltips with <code>[Tooltip("Description")]</code></span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Use <code>[Range(min, max)]</code> for numeric sliders</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Group related fields with <code>[Header("Group Name")]</code></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive Inspector functionality
+        const scorePerTargetInput = document.getElementById('scorePerTarget');
+        const timeLimitInput = document.getElementById('timeLimit');
+        const previewScore = document.getElementById('previewScore');
+        const previewTimer = document.getElementById('previewTimer');
+        const simulateBtn = document.getElementById('simulateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        let simulationInterval;
+        let currentScore = 0;
+        let timeRemaining;
+        
+        function updatePreview() {
+            previewScore.textContent = currentScore;
+        }
+        
+        function resetSimulation() {
+            clearInterval(simulationInterval);
+            currentScore = 0;
+            timeRemaining = parseInt(timeLimitInput.value);
+            previewTimer.style.width = '100%';
+            updatePreview();
+            simulateBtn.disabled = false;
+        }
+        
+        simulateBtn.addEventListener('click', function() {
+            resetSimulation();
+            this.disabled = true;
+            
+            const scoreValue = parseInt(scorePerTargetInput.value);
+            const timeLimit = parseInt(timeLimitInput.value);
+            timeRemaining = timeLimit;
+            
+            simulationInterval = setInterval(() => {
+                // Add score randomly
+                if (Math.random() > 0.7) {
+                    currentScore += scoreValue;
+                    updatePreview();
+                }
+                
+                // Update timer
+                timeRemaining--;
+                const percentRemaining = (timeRemaining / timeLimit) * 100;
+                previewTimer.style.width = `${percentRemaining}%`;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(simulationInterval);
+                }
+            }, 100);
+        });
+        
+        resetBtn.addEventListener('click', resetSimulation);
+        
+        // Update preview when inputs change
+        scorePerTargetInput.addEventListener('input', resetSimulation);
+        timeLimitInput.addEventListener('input', resetSimulation);
+        
+        // Initialize
+        resetSimulation();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_07_booleans.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_09_script_test.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_09_script_test.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_07_booleans.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 10;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

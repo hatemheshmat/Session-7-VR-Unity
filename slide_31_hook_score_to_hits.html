@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hook Score to Hits</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow: auto;
+            max-height: 220px;
+        }
+        
+        .code-comment { color: #6A9955; }
+        .code-keyword { color: #569CD6; }
+        .code-string { color: #CE9178; }
+        .code-method { color: #DCDCAA; }
+        .code-type { color: #4EC9B0; }
+        
+        .event-flow {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 250px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .event-component {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 0.75rem;
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            width: 120px;
+        }
+        
+        .event-component-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #0078D7;
+        }
+        
+        .event-component-label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        
+        .event-arrow {
+            position: absolute;
+            height: 2px;
+            background: #0078D7;
+            transform-origin: left;
+        }
+        
+        .event-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid #0078D7;
+        }
+        
+        .event-pulse {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0078D7;
+            transform: scale(0);
+            opacity: 0;
+        }
+        
+        .event-highlight {
+            box-shadow: 0 0 15px rgba(0, 120, 215, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-link mr-2"></i>
+                Part 4: Target Practice Game
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Hook Score to Hits</h1>
+            <p class="text-lg text-gray-600">Connecting XR Interactions to Score System</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Event Handling -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-bolt mr-2"></i>
+                    XR Interaction Events
+                </h3>
+                
+                <p class="text-sm mb-3">Connect the XR Ray Interactor's events to your scoring system using the OnSelectEntered event to detect when a target is hit by the player.</p>
+                
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-hand-pointer"></i></div>
+                        <div class="feature-text">OnSelectEntered</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-hand-paper"></i></div>
+                        <div class="feature-text">OnSelectExited</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-mouse-pointer"></i></div>
+                        <div class="feature-text">OnHoverEntered</div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-mouse"></i></div>
+                        <div class="feature-text">OnHoverExited</div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+<span class="code-keyword">using</span> UnityEngine;
+<span class="code-keyword">using</span> UnityEngine.XR.Interaction.Toolkit;
+<span class="code-keyword">using</span> TMPro;
+
+<span class="code-keyword">public class</span> <span class="code-type">Target</span> : MonoBehaviour
+{
+    [SerializeField] <span class="code-keyword">private int</span> pointValue = 10;
+    <span class="code-keyword">private</span> <span class="code-type">ScoreManager</span> scoreManager;
+    <span class="code-keyword">private</span> <span class="code-type">XRSimpleInteractable</span> interactable;
+    
+    <span class="code-keyword">void</span> <span class="code-method">Start</span>()
+    {
+        <span class="code-comment">// Find the ScoreManager in the scene</span>
+        scoreManager = FindObjectOfType&lt;ScoreManager&gt;();
+        
+        <span class="code-comment">// Get the XR interactable component</span>
+        interactable = GetComponent&lt;XRSimpleInteractable&gt;();
+        
+        <span class="code-comment">// Hook up the event</span>
+        interactable.selectEntered.AddListener(OnHit);
+    }
+    
+    <span class="code-keyword">public void</span> <span class="code-method">OnHit</span>(<span class="code-type">SelectEnterEventArgs</span> args)
+    {
+        <span class="code-comment">// Add points when target is hit</span>
+        scoreManager.AddPoints(pointValue);
+        
+        <span class="code-comment">// Visual feedback (change material, etc.)</span>
+        <span class="code-comment">// ...</span>
+    }
+}
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Visualization -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-project-diagram mr-2"></i>
+                    Event Flow Visualization
+                </h3>
+                
+                <div class="event-flow" id="eventFlow">
+                    <!-- Components will be added by JavaScript -->
+                </div>
+                
+                <div class="flex justify-center mt-3">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" id="triggerBtn">
+                        <i class="fas fa-play mr-1"></i> Trigger Event Flow
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-3">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Add Interactable</div>
+                            <div class="step-description">Add XRSimpleInteractable to target</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Create Target Script</div>
+                            <div class="step-description">With OnHit method</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive event flow visualization
+        const eventFlow = document.getElementById('eventFlow');
+        const triggerBtn = document.getElementById('triggerBtn');
+        
+        // Create components
+        const components = [
+            { id: 'controller', icon: 'fa-gamepad', label: 'XR Controller', x: 60, y: 125 },
+            { id: 'ray', icon: 'fa-laser-pointer', label: 'Ray Interactor', x: 220, y: 80 },
+            { id: 'target', icon: 'fa-bullseye', label: 'Target', x: 380, y: 80 },
+            { id: 'score', icon: 'fa-calculator', label: 'Score Manager', x: 380, y: 170 },
+            { id: 'ui', icon: 'fa-tv', label: 'UI Text', x: 540, y: 125 }
+        ];
+        
+        // Create arrows
+        const arrows = [
+            { from: 'controller', to: 'ray', delay: 0 },
+            { from: 'ray', to: 'target', delay: 500 },
+            { from: 'target', to: 'score', delay: 1000 },
+            { from: 'score', to: 'ui', delay: 1500 }
+        ];
+        
+        // Create components
+        components.forEach(comp => {
+            const element = document.createElement('div');
+            element.id = comp.id;
+            element.className = 'event-component';
+            element.style.left = `${comp.x}px`;
+            element.style.top = `${comp.y}px`;
+            
+            element.innerHTML = `
+                <div class="event-component-icon">
+                    <i class="fas ${comp.icon}"></i>
+                </div>
+                <div class="event-component-label">${comp.label}</div>
+            `;
+            
+            eventFlow.appendChild(element);
+        });
+        
+        // Create arrows
+        arrows.forEach(arrow => {
+            const element = document.createElement('div');
+            element.className = 'event-arrow';
+            element.id = `arrow-${arrow.from}-${arrow.to}`;
+            eventFlow.appendChild(element);
+            
+            // Position will be set in positionArrows function
+        });
+        
+        // Create pulse elements
+        arrows.forEach(arrow => {
+            const element = document.createElement('div');
+            element.className = 'event-pulse';
+            element.id = `pulse-${arrow.from}-${arrow.to}`;
+            eventFlow.appendChild(element);
+        });
+        
+        // Position arrows
+        function positionArrows() {
+            arrows.forEach(arrow => {
+                const fromElement = document.getElementById(arrow.from);
+                const toElement = document.getElementById(arrow.to);
+                
+                const fromRect = fromElement.getBoundingClientRect();
+                const toRect = toElement.getBoundingClientRect();
+                
+                const fromCenterX = fromRect.left + fromRect.width / 2;
+                const fromCenterY = fromRect.top + fromRect.height / 2;
+                const toCenterX = toRect.left + toRect.width / 2;
+                const toCenterY = toRect.top + toRect.height / 2;
+                
+                const dx = toCenterX - fromCenterX;
+                const dy = toCenterY - fromCenterY;
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                const length = Math.sqrt(dx * dx + dy * dy) - 60; // Adjust for component size
+                
+                const arrowElement = document.getElementById(`arrow-${arrow.from}-${arrow.to}`);
+                arrowElement.style.width = `${length}px`;
+                arrowElement.style.left = `${fromCenterX - eventFlow.getBoundingClientRect().left + 30}px`;
+                arrowElement.style.top = `${fromCenterY - eventFlow.getBoundingClientRect().top}px`;
+                arrowElement.style.transform = `rotate(${angle}deg)`;
+                
+                // Position pulse at start of arrow
+                const pulseElement = document.getElementById(`pulse-${arrow.from}-${arrow.to}`);
+                pulseElement.style.left = `${fromCenterX - eventFlow.getBoundingClientRect().left + 30}px`;
+                pulseElement.style.top = `${fromCenterY - eventFlow.getBoundingClientRect().top - 6}px`;
+            });
+        }
+        
+        // Call once to position initially
+        setTimeout(positionArrows, 100);
+        
+        // Trigger event flow animation
+        triggerBtn.addEventListener('click', function() {
+            // Reset all components
+            components.forEach(comp => {
+                const element = document.getElementById(comp.id);
+                element.classList.remove('event-highlight');
+            });
+            
+            // Animate each step
+            arrows.forEach((arrow, index) => {
+                setTimeout(() => {
+                    // Highlight from component
+                    const fromElement = document.getElementById(arrow.from);
+                    fromElement.classList.add('event-highlight');
+                    
+                    // Animate pulse
+                    const pulseElement = document.getElementById(`pulse-${arrow.from}-${arrow.to}`);
+                    pulseElement.style.transform = 'scale(1)';
+                    pulseElement.style.opacity = '1';
+                    
+                    // Animate pulse along arrow
+                    const arrowElement = document.getElementById(`arrow-${arrow.from}-${arrow.to}`);
+                    const arrowLength = parseFloat(arrowElement.style.width);
+                    const arrowAngle = parseFloat(arrowElement.style.transform.replace('rotate(', '').replace('deg)', ''));
+                    
+                    // Animate pulse
+                    let progress = 0;
+                    const animateInterval = setInterval(() => {
+                        progress += 0.05;
+                        if (progress >= 1) {
+                            clearInterval(animateInterval);
+                            pulseElement.style.transform = 'scale(0)';
+                            pulseElement.style.opacity = '0';
+                            
+                            // Highlight to component
+                            const toElement = document.getElementById(arrow.to);
+                            toElement.classList.add('event-highlight');
+                        } else {
+                            const x = progress * arrowLength;
+                            const radians = arrowAngle * Math.PI / 180;
+                            const offsetX = x * Math.cos(radians);
+                            const offsetY = x * Math.sin(radians);
+                            
+                            pulseElement.style.transform = 'scale(1)';
+                            pulseElement.style.left = `${parseFloat(pulseElement.style.left) + offsetX}px`;
+                            pulseElement.style.top = `${parseFloat(pulseElement.style.top) + offsetY}px`;
+                        }
+                    }, 50);
+                    
+                }, arrow.delay);
+            });
+            
+            // Reset after animation completes
+            setTimeout(() => {
+                components.forEach(comp => {
+                    const element = document.getElementById(comp.id);
+                    element.classList.remove('event-highlight');
+                });
+                
+                // Reset pulse positions
+                positionArrows();
+            }, arrows[arrows.length - 1].delay + 2000);
+        });
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_30_break.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_32_scoremanager_prefab.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_32_scoremanager_prefab.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_30_break.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 35;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

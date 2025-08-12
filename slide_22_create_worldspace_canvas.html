@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Canvas (World-Space)</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .inspector-panel {
+            background: #383838;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        
+        .inspector-header {
+            background: #2a2a2a;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .inspector-content {
+            padding: 0.75rem;
+        }
+        
+        .inspector-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .inspector-label {
+            flex: 1;
+            font-size: 0.8rem;
+        }
+        
+        .inspector-value {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .inspector-dropdown {
+            background: #4a4a4a;
+            border: 1px solid #5a5a5a;
+            border-radius: 3px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            width: 100%;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .inspector-dropdown::after {
+            content: '▼';
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.6rem;
+        }
+        
+        .inspector-dropdown.active {
+            background: #5a5a5a;
+        }
+        
+        .inspector-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #4a4a4a;
+            border: 1px solid #5a5a5a;
+            border-radius: 3px;
+            z-index: 10;
+            display: none;
+        }
+        
+        .inspector-dropdown-menu.active {
+            display: block;
+        }
+        
+        .inspector-dropdown-item {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .inspector-dropdown-item:hover {
+            background: #5a5a5a;
+        }
+        
+        .inspector-dropdown-item.selected {
+            background: #0078D7;
+        }
+        
+        .inspector-input {
+            background: #4a4a4a;
+            border: 1px solid #5a5a5a;
+            border-radius: 3px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            width: 100%;
+            color: #e2e8f0;
+        }
+        
+        .inspector-vector3 {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .inspector-vector3-input {
+            background: #4a4a4a;
+            border: 1px solid #5a5a5a;
+            border-radius: 3px;
+            padding: 0.25rem;
+            font-size: 0.8rem;
+            width: 50px;
+            color: #e2e8f0;
+            text-align: center;
+        }
+        
+        .inspector-vector3-label {
+            width: 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .canvas-preview {
+            position: relative;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+        
+        .canvas-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #0078D7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #0078D7;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+        
+        .scale-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 0.5rem;
+            border-radius: 0 0.25rem 0.25rem 0;
+            margin-top: 0.5rem;
+        }
+        
+        .scale-warning-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 0.1rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        
+        .scale-warning-text {
+            font-size: 0.7rem;
+            color: #856404;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-tv mr-2"></i>
+                Part 3: UI & Score Canvas
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Create Canvas (World-Space)</h1>
+            <p class="text-lg text-gray-600">Setting Up a World-Space Canvas for VR UI</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Step-by-Step Guide -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-list-ol mr-2"></i>
+                    Creation Steps
+                </h3>
+                
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Create a Canvas GameObject</div>
+                        <div class="step-description">Right-click in Hierarchy panel → UI → Canvas</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Change Render Mode</div>
+                        <div class="step-description">In the Inspector panel, find the Canvas component and set Render Mode to "World Space"</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Adjust Scale for VR</div>
+                        <div class="step-description">Set the Transform scale to a small value (typically 0.001-0.01) for comfortable viewing in VR</div>
+                    </div>
+                </div>
+                
+                <div class="scale-warning">
+                    <div class="scale-warning-title">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        VR Scale Consideration
+                    </div>
+                    <div class="scale-warning-text">
+                        For VR, canvas scale should be small (0.001-0.01) to appear at a comfortable size and distance from the user.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Inspector Visualization -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-sliders-h mr-2"></i>
+                    Canvas Inspector Settings
+                </h3>
+                
+                <div class="inspector-panel">
+                    <div class="inspector-header">
+                        <span>Canvas</span>
+                        <span><i class="fas fa-cog"></i></span>
+                    </div>
+                    <div class="inspector-content">
+                        <div class="inspector-field">
+                            <div class="inspector-label">Render Mode</div>
+                            <div class="inspector-value">
+                                <div class="inspector-dropdown" id="renderModeDropdown">
+                                    World Space
+                                </div>
+                                <div class="inspector-dropdown-menu" id="renderModeMenu">
+                                    <div class="inspector-dropdown-item">Screen Space - Overlay</div>
+                                    <div class="inspector-dropdown-item">Screen Space - Camera</div>
+                                    <div class="inspector-dropdown-item selected">World Space</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="inspector-field">
+                            <div class="inspector-label">Event Camera</div>
+                            <div class="inspector-value">
+                                <div class="inspector-dropdown">
+                                    Main Camera (Camera)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="inspector-header">
+                        <span>Transform</span>
+                        <span><i class="fas fa-cog"></i></span>
+                    </div>
+                    <div class="inspector-content">
+                        <div class="inspector-field">
+                            <div class="inspector-label">Scale</div>
+                            <div class="inspector-value">
+                                <div class="inspector-vector3">
+                                    <div class="inspector-vector3-label">X</div>
+                                    <input type="text" class="inspector-vector3-input" id="scaleX" value="0.01">
+                                    <div class="inspector-vector3-label">Y</div>
+                                    <input type="text" class="inspector-vector3-input" id="scaleY" value="0.01">
+                                    <div class="inspector-vector3-label">Z</div>
+                                    <input type="text" class="inspector-vector3-input" id="scaleZ" value="0.01">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Section: Canvas Preview -->
+        <div>
+            <h3 class="text-lg font-semibold unity-blue mb-2 text-center text-center mx-auto">
+                <i class="fas fa-eye mr-2"></i>
+                Canvas Preview
+            </h3>
+            
+            <div class="canvas-preview">
+                <div class="canvas-element" id="canvasPreview">
+                    <div class="p-3 text-center">
+                        <div class="text-sm mb-1">World Space Canvas</div>
+                        <div class="text-lg font-bold">SCORE: 100</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-4 mt-2">
+                <div class="text-center">
+                    <div class="text-sm font-semibold unity-blue">Event Camera</div>
+                    <div class="text-xs text-gray-600">Set to Main Camera</div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="text-sm font-semibold unity-blue">Canvas Size</div>
+                    <div class="text-xs text-gray-600">Default: 1000x1000 units</div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="text-sm font-semibold unity-blue">Positioning</div>
+                    <div class="text-xs text-gray-600">1-2 meters from camera</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Canvas preview
+        const canvasPreview = document.getElementById('canvasPreview');
+        const scaleXInput = document.getElementById('scaleX');
+        const scaleYInput = document.getElementById('scaleY');
+        const scaleZInput = document.getElementById('scaleZ');
+        
+        // Initial position
+        canvasPreview.style.width = '300px';
+        canvasPreview.style.height = '150px';
+        canvasPreview.style.left = 'calc(50% - 150px)';
+        canvasPreview.style.top = 'calc(50% - 75px)';
+        canvasPreview.style.transform = 'perspective(1000px) rotateX(10deg)';
+        
+        // Scale inputs
+        function updateCanvasScale() {
+            const scaleX = parseFloat(scaleXInput.value);
+            const scaleY = parseFloat(scaleYInput.value);
+            const scaleZ = parseFloat(scaleZInput.value);
+            
+            // Use scale to adjust the preview size (inverse relationship for demo)
+            const baseSize = 0.01; // Reference scale
+            const scaleFactor = scaleX / baseSize;
+            
+            const newWidth = 300 * scaleFactor;
+            const newHeight = 150 * scaleFactor;
+            
+            canvasPreview.style.width = `${newWidth}px`;
+            canvasPreview.style.height = `${newHeight}px`;
+            canvasPreview.style.left = `calc(50% - ${newWidth/2}px)`;
+            canvasPreview.style.top = `calc(50% - ${newHeight/2}px)`;
+        }
+        
+        scaleXInput.addEventListener('input', function() {
+            scaleYInput.value = this.value;
+            scaleZInput.value = this.value;
+            updateCanvasScale();
+        });
+        
+        // Render mode dropdown
+        const renderModeDropdown = document.getElementById('renderModeDropdown');
+        const renderModeMenu = document.getElementById('renderModeMenu');
+        const renderModeItems = document.querySelectorAll('.inspector-dropdown-item');
+        
+        renderModeDropdown.addEventListener('click', function() {
+            renderModeMenu.classList.toggle('active');
+            renderModeDropdown.classList.toggle('active');
+        });
+        
+        renderModeItems.forEach(item => {
+            item.addEventListener('click', function() {
+                renderModeItems.forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                renderModeDropdown.textContent = this.textContent;
+                renderModeMenu.classList.remove('active');
+                renderModeDropdown.classList.remove('active');
+            });
+        });
+        
+        // Animate canvas
+        function animateCanvas() {
+            const time = Date.now() * 0.001;
+            const rotationY = Math.sin(time * 0.5) * 5;
+            
+            canvasPreview.style.transform = `perspective(1000px) rotateX(10deg) rotateY(${rotationY}deg)`;
+            
+            requestAnimationFrame(animateCanvas);
+        }
+        
+        animateCanvas();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_21_worldspace_canvas.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_23_add_tmp_package.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_23_add_tmp_package.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_21_worldspace_canvas.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 25;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

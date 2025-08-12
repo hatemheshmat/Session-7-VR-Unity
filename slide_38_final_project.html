@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Project: Target Practice Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .feature-text {
+            font-size: 0.9rem;
+        }
+        
+        .architecture-diagram {
+            width: 100%;
+            min-height: 200px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .component {
+            position: absolute;
+            background: white;
+            border: 2px solid #0078D7;
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .component:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        .component-icon {
+            font-size: 1.25rem;
+            color: #0078D7;
+            margin-bottom: 0.25rem;
+        }
+        
+        .component-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: #5C2D91;
+            transform-origin: left;
+            z-index: 1;
+        }
+        
+        .connection::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid #5C2D91;
+        }
+        
+        .game-visualization {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+        
+        .game-scene {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .game-floor {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotateX(60deg) translateZ(-50px);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-target {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, white 0%, white 30%, red 30%, red 60%, white 60%, white 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        .game-target.hit {
+            background: radial-gradient(circle, #0078D7 0%, #0078D7 30%, #5C2D91 30%, #5C2D91 60%, #0078D7 60%, #0078D7 100%);
+            color: white;
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+        
+        .game-ray {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            width: 2px;
+            height: 0;
+            background: rgba(255, 255, 255, 0.8);
+            transform-origin: bottom;
+            transform: translateX(-50%);
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        .game-controller {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-controller i {
+            color: #0078D7;
+            font-size: 1.25rem;
+        }
+        
+        .game-ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-score {
+            font-weight: 600;
+            color: #0078D7;
+            font-size: 0.9rem;
+        }
+        
+        .game-timer {
+            font-weight: 600;
+            color: #5C2D91;
+            font-size: 0.9rem;
+        }
+        
+        .step-item {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0078D7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-cube mr-2"></i>
+                Part 4: Target Practice Game
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Final Project: Target Practice Game</h1>
+            <p class="text-lg text-gray-600">Putting It All Together</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Project Overview -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-project-diagram mr-2"></i>
+                    Game Architecture
+                </h3>
+                
+                <div class="architecture-diagram" id="architectureDiagram">
+                    <!-- Components and connections will be added by JavaScript -->
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Set Up Scene</div>
+                            <div class="step-description">XR Rig, UI Canvas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Create Prefabs</div>
+                            <div class="step-description">Targets, ScoreManager</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <p class="text-sm"><span class="font-semibold unity-blue">Architecture Pattern:</span> Use event-driven communication between components to maintain loose coupling.</p>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive Visualization -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-gamepad mr-2"></i>
+                    Game Visualization
+                </h3>
+                
+                <div class="game-visualization">
+                    <div class="game-scene" id="gameScene">
+                        <div class="game-floor"></div>
+                        <div class="game-controller">
+                            <i class="fas fa-vr-cardboard"></i>
+                        </div>
+                        <div class="game-ray" id="gameRay"></div>
+                        <div class="game-ui">
+                            <div class="game-score" id="gameScore">Score: 0</div>
+                            <div class="game-timer" id="gameTimer">Time: 60</div>
+                        </div>
+                        <!-- Targets will be added by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="flex justify-center mt-2">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" id="shootBtn">
+                        <i class="fas fa-bullseye mr-1"></i> Shoot Ray
+                    </button>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-r-lg mt-2">
+                    <p class="text-sm"><span class="font-semibold unity-blue">Final Project:</span> This target practice game combines all the concepts learned in this session: XR Ray Interactors, UI Canvas, and C# scripting.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Architecture diagram
+        const architectureDiagram = document.getElementById('architectureDiagram');
+        
+        // Define components
+        const components = [
+            { id: 'gameManager', icon: 'fa-cogs', label: 'Game Manager', x: 180, y: 30, width: 120, height: 50 },
+            { id: 'scoreManager', icon: 'fa-star', label: 'Score Manager', x: 50, y: 110, width: 120, height: 50 },
+            { id: 'gameTimer', icon: 'fa-clock', label: 'Game Timer', x: 180, y: 110, width: 120, height: 50 },
+            { id: 'targetSpawner', icon: 'fa-bullseye', label: 'Target Spawner', x: 310, y: 110, width: 120, height: 50 }
+        ];
+        
+        // Define connections
+        const connections = [
+            { from: 'gameManager', to: 'scoreManager' },
+            { from: 'gameManager', to: 'gameTimer' },
+            { from: 'gameManager', to: 'targetSpawner' }
+        ];
+        
+        // Create components
+        components.forEach(component => {
+            const componentElement = document.createElement('div');
+            componentElement.id = component.id;
+            componentElement.className = 'component';
+            componentElement.style.width = `${component.width}px`;
+            componentElement.style.height = `${component.height}px`;
+            componentElement.style.left = `${component.x}px`;
+            componentElement.style.top = `${component.y}px`;
+            
+            componentElement.innerHTML = `
+                <div class="component-icon">
+                    <i class="fas ${component.icon}"></i>
+                </div>
+                <div class="component-label">${component.label}</div>
+            `;
+            
+            architectureDiagram.appendChild(componentElement);
+        });
+        
+        // Create connections
+        connections.forEach(connection => {
+            setTimeout(() => {
+                const fromElement = document.getElementById(connection.from);
+                const toElement = document.getElementById(connection.to);
+                
+                if (!fromElement || !toElement) return;
+                
+                const fromRect = fromElement.getBoundingClientRect();
+                const toRect = toElement.getBoundingClientRect();
+                const diagramRect = architectureDiagram.getBoundingClientRect();
+                
+                const fromCenterX = fromRect.left + fromRect.width / 2 - diagramRect.left;
+                const fromCenterY = fromRect.top + fromRect.height / 2 - diagramRect.top;
+                const toCenterX = toRect.left + toRect.width / 2 - diagramRect.left;
+                const toCenterY = toRect.top + toRect.height / 2 - diagramRect.top;
+                
+                const dx = toCenterX - fromCenterX;
+                const dy = toCenterY - fromCenterY;
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                
+                const connectionElement = document.createElement('div');
+                connectionElement.className = 'connection';
+                connectionElement.style.width = `${length}px`;
+                connectionElement.style.left = `${fromCenterX}px`;
+                connectionElement.style.top = `${fromCenterY}px`;
+                connectionElement.style.transform = `rotate(${angle}deg)`;
+                
+                architectureDiagram.appendChild(connectionElement);
+            }, 100);
+        });
+        
+        // Game visualization
+        const gameScene = document.getElementById('gameScene');
+        const gameRay = document.getElementById('gameRay');
+        const shootBtn = document.getElementById('shootBtn');
+        const gameScore = document.getElementById('gameScore');
+        const gameTimer = document.getElementById('gameTimer');
+        
+        let score = 0;
+        let timer = 60;
+        let gameInterval;
+        let targets = [];
+        
+        // Create targets
+        function createTargets() {
+            // Clear existing targets
+            targets.forEach(target => {
+                if (target.element && target.element.parentNode) {
+                    target.element.parentNode.removeChild(target.element);
+                }
+            });
+            targets = [];
+            
+            // Create new targets
+            for (let i = 0; i < 3; i++) {
+                const x = 50 + Math.random() * 300;
+                const y = 50 + Math.random() * 100;
+                const z = -100 - Math.random() * 200;
+                const value = (Math.floor(Math.random() * 5) + 1) * 10;
+                
+                const targetElement = document.createElement('div');
+                targetElement.className = 'game-target';
+                targetElement.style.left = `${x}px`;
+                targetElement.style.top = `${y}px`;
+                targetElement.style.transform = `translateZ(${z}px)`;
+                targetElement.textContent = value;
+                
+                gameScene.appendChild(targetElement);
+                
+                targets.push({
+                    element: targetElement,
+                    x,
+                    y,
+                    z,
+                    value,
+                    hit: false
+                });
+                
+                // Add click handler
+                targetElement.addEventListener('click', () => {
+                    if (!targetElement.classList.contains('hit')) {
+                        targetElement.classList.add('hit');
+                        score += value;
+                        gameScore.textContent = `Score: ${score}`;
+                        
+                        // Remove after animation
+                        setTimeout(() => {
+                            if (targetElement.parentNode) {
+                                targetElement.parentNode.removeChild(targetElement);
+                                
+                                // Create a new target
+                                setTimeout(() => {
+                                    createTargets();
+                                }, 1000);
+                            }
+                        }, 1000);
+                    }
+                });
+            }
+        }
+        
+        // Shoot ray
+        function shootRay() {
+            // Reset ray
+            gameRay.style.height = '0';
+            gameRay.style.transform = 'translateX(-50%) rotate(0deg)';
+            
+            // Get random target or miss
+            const hitTarget = Math.random() > 0.3 ? targets[Math.floor(Math.random() * targets.length)] : null;
+            
+            // Calculate ray angle
+            let rayAngle = 0;
+            let rayLength = 300;
+            
+            if (hitTarget && !hitTarget.hit) {
+                const targetRect = hitTarget.element.getBoundingClientRect();
+                const controllerRect = document.querySelector('.game-controller').getBoundingClientRect();
+                
+                const dx = (targetRect.left + targetRect.width / 2) - (controllerRect.left + controllerRect.width / 2);
+                const dy = (targetRect.top + targetRect.height / 2) - (controllerRect.top + controllerRect.height / 2);
+                rayAngle = Math.atan2(dx, -dy) * 180 / Math.PI;
+                
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                rayLength = distance;
+            } else {
+                // Random miss angle
+                rayAngle = (Math.random() * 60 - 30);
+            }
+            
+            // Animate ray
+            setTimeout(() => {
+                gameRay.style.height = `${rayLength}px`;
+                gameRay.style.transform = `translateX(-50%) rotate(${rayAngle}deg)`;
+                
+                // Hit target
+                if (hitTarget && !hitTarget.hit) {
+                    setTimeout(() => {
+                        hitTarget.element.click();
+                    }, 200);
+                }
+                
+                // Hide ray after animation
+                setTimeout(() => {
+                    gameRay.style.height = '0';
+                }, 1000);
+            }, 100);
+        }
+        
+        // Start game
+        function startGame() {
+            // Reset game state
+            score = 0;
+            timer = 60;
+            gameScore.textContent = `Score: ${score}`;
+            gameTimer.textContent = `Time: ${timer}`;
+            
+            // Create targets
+            createTargets();
+            
+            // Start timer
+            clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                timer--;
+                gameTimer.textContent = `Time: ${timer}`;
+                
+                if (timer <= 0) {
+                    clearInterval(gameInterval);
+                    // Game over
+                }
+            }, 1000);
+        }
+        
+        // Event listeners
+        shootBtn.addEventListener('click', shootRay);
+        
+        // Initialize game
+        startGame();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_37_game_ui_panels.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_39_session_recap.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_39_session_recap.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_37_game_ui_panels.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 42;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anchor Canvas to Player Rig</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .unity-blue { color: #0078D7; }
+        .meta-purple { color: #5C2D91; }
+        
+        .part-badge {
+            background: linear-gradient(135deg, #0078D7, #5C2D91);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #e2e8f0;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            position: relative;
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .type { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        
+        .vr-scene {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            height: 200px;
+            perspective: 1000px;
+        }
+        
+        .player-rig {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+        
+        .headset {
+            width: 40px;
+            height: 30px;
+            background: #333;
+            border-radius: 6px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .headset::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: #0078D7;
+            border-radius: 50%;
+        }
+        
+        .ui-canvas {
+            position: absolute;
+            width: 80px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #0078D7;
+            border-radius: 6px;
+            top: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #0078D7;
+            transition: all 0.5s ease;
+        }
+        
+        .movement-controls {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .move-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            font-size: 0.6rem;
+        }
+        
+        .move-left { background: #28a745; }
+        .move-right { background: #dc3545; }
+        .move-up { background: #ffc107; color: #000; }
+        .move-down { background: #6c757d; }
+        
+        .move-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .hierarchy-view {
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            padding: 0.75rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+        }
+        
+        .hierarchy-item {
+            padding: 0.1rem 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .hierarchy-icon {
+            margin-right: 0.5rem;
+            width: 12px;
+            text-align: center;
+        }
+        
+        .hierarchy-indent {
+            margin-left: 0.75rem;
+        }
+        
+        .hierarchy-indent-2 {
+            margin-left: 1.5rem;
+        }
+        
+        .component-tag {
+            background: #e3f2fd;
+            color: #0078D7;
+            padding: 0.05rem 0.2rem;
+            border-radius: 2px;
+            font-size: 0.6rem;
+            margin-left: 0.25rem;
+        }
+        
+        .anchor-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .anchor-option {
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+            padding: 0.5rem;
+            border-left: 3px solid #0078D7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .anchor-option:hover {
+            background: #e3f2fd;
+            border-color: #0078D7;
+        }
+        
+        .anchor-option.active {
+            background: #e3f2fd;
+            border-color: #0078D7;
+        }
+        
+        .anchor-title {
+            font-weight: 600;
+            color: #0078D7;
+            margin-bottom: 0.25rem;
+            font-size: 0.7rem;
+        }
+        
+        .anchor-desc {
+            font-size: 0.6rem;
+            color: #666;
+        }
+    
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.slide-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: url('assets/background.svg') no-repeat center center;
+    background-size: cover;
+}
+
+.navigation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: rgba(0, 120, 215, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 120, 215, 1);
+    transform: scale(1.1);
+}
+
+.slide-number {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+</style>
+<link rel="stylesheet" href="css/responsive-slides-fixed.css">
+<link rel="stylesheet" href="css/responsive-footer-fixed.css">
+<link rel="stylesheet" href="css/notes-panel-fixed.css">
+<link rel="stylesheet" href="css/dark-theme.css">
+<link rel="stylesheet" href="css/consistent-styles.css">
+</head>
+<body>
+    <div class="slide-container">
+<div class="slide-content-wrapper" style="padding-bottom: 80px !important;">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="part-badge">
+                <i class="fas fa-anchor mr-2"></i>
+                Part 3: UI & Score Canvas
+            </div>
+            <h1 class="text-4xl font-bold unity-blue mb-1 text-center mx-auto">Anchor Canvas to Player Rig</h1>
+            <p class="text-lg text-gray-600">Consistent UI Positioning in VR Space</p>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Left: Hierarchy and Anchoring Options -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-sitemap mr-2"></i>
+                    Canvas Hierarchy Setup
+                </h3>
+                
+                <div class="hierarchy-view mb-3">
+                    <div class="hierarchy-item">
+                        <span class="hierarchy-icon"><i class="fas fa-cube text-gray-500"></i></span>
+                        <span>XR Origin (XR Rig)</span>
+                    </div>
+                    
+                    <div class="hierarchy-item hierarchy-indent">
+                        <span class="hierarchy-icon"><i class="fas fa-video text-blue-500"></i></span>
+                        <span>Main Camera</span>
+                    </div>
+                    
+                    <div class="hierarchy-item hierarchy-indent">
+                        <span class="hierarchy-icon"><i class="fas fa-tv text-purple-500"></i></span>
+                        <span>UI Canvas</span>
+                        <span class="component-tag">Canvas</span>
+                    </div>
+                    
+                    <div class="hierarchy-item hierarchy-indent-2">
+                        <span class="hierarchy-icon"><i class="fas fa-font text-orange-500"></i></span>
+                        <span>Score Text</span>
+                        <span class="component-tag">TextMeshPro</span>
+                    </div>
+                </div>
+                
+                <div class="anchor-options">
+                    <div class="anchor-option active" data-anchor="camera">
+                        <div class="anchor-title">Camera Child</div>
+                        <div class="anchor-desc">Follows head movement</div>
+                    </div>
+                    
+                    <div class="anchor-option" data-anchor="rig">
+                        <div class="anchor-title">XR Rig Child</div>
+                        <div class="anchor-desc">Moves with player</div>
+                    </div>
+                    
+                    <div class="anchor-option" data-anchor="world">
+                        <div class="anchor-title">World Space</div>
+                        <div class="anchor-desc">Fixed world position</div>
+                    </div>
+                    
+                    <div class="anchor-option" data-anchor="controller">
+                        <div class="anchor-title">Controller Child</div>
+                        <div class="anchor-desc">Attached to hand</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Interactive VR Scene -->
+            <div>
+                <h3 class="text-lg font-semibold unity-blue mb-2 text-center mx-auto">
+                    <i class="fas fa-cube mr-2"></i>
+                    Interactive VR Scene
+                </h3>
+                
+                <div class="vr-scene">
+                    <div class="player-rig" id="playerRig">
+                        <div class="headset"></div>
+                        <div class="ui-canvas" id="uiCanvas">
+                            SCORE: 100
+                        </div>
+                    </div>
+                    
+                    <div class="movement-controls">
+                        <button class="move-btn move-left" id="moveLeft">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <button class="move-btn move-right" id="moveRight">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button class="move-btn move-up" id="moveUp">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="move-btn move-down" id="moveDown">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Code Examples -->
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <h4 class="font-semibold unity-blue mb-1">Canvas Anchoring Script</h4>
+                <div class="code-block">
+<span class="keyword">using</span> UnityEngine;
+
+<span class="keyword">public class</span> <span class="type">CanvasAnchor</span> : MonoBehaviour
+{
+    <span class="keyword">public</span> Transform playerCamera;
+    <span class="keyword">public</span> <span class="keyword">float</span> distance = 2f;
+    <span class="keyword">public</span> <span class="keyword">float</span> height = 0.5f;
+    
+    <span class="keyword">void</span> <span class="method">Start</span>()
+    {
+        <span class="type">Vector3</span> position = playerCamera.position + 
+                         playerCamera.forward * distance + 
+                         <span class="type">Vector3</span>.up * height;
+        transform.position = position;
+        transform.<span class="method">LookAt</span>(playerCamera);
+    }
+}
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="font-semibold unity-blue mb-1">Dynamic Canvas Positioning</h4>
+                <div class="code-block">
+<span class="keyword">void</span> <span class="method">Update</span>()
+{
+    <span class="type">Vector3</span> targetPosition = playerCamera.position + 
+                            playerCamera.forward * distance + 
+                            <span class="type">Vector3</span>.up * height;
+    
+    <span class="comment">// Smooth follow with Lerp</span>
+    transform.position = <span class="type">Vector3</span>.<span class="method">Lerp</span>(
+        transform.position, 
+        targetPosition, 
+        <span class="type">Time</span>.deltaTime * followSpeed
+    );
+    
+    transform.<span class="method">LookAt</span>(playerCamera);
+}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        // Interactive VR scene
+        const playerRig = document.getElementById('playerRig');
+        const uiCanvas = document.getElementById('uiCanvas');
+        const moveLeft = document.getElementById('moveLeft');
+        const moveRight = document.getElementById('moveRight');
+        const moveUp = document.getElementById('moveUp');
+        const moveDown = document.getElementById('moveDown');
+        const anchorOptions = document.querySelectorAll('.anchor-option');
+        
+        let currentAnchor = 'camera';
+        let rigPosition = { x: 0, y: 0 };
+        
+        // Anchor option selection
+        anchorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                anchorOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                currentAnchor = this.getAttribute('data-anchor');
+                updateCanvasPosition();
+            });
+        });
+        
+        // Movement controls
+        moveLeft.addEventListener('click', function() {
+            rigPosition.x -= 30;
+            updatePlayerPosition();
+        });
+        
+        moveRight.addEventListener('click', function() {
+            rigPosition.x += 30;
+            updatePlayerPosition();
+        });
+        
+        moveUp.addEventListener('click', function() {
+            rigPosition.y -= 20;
+            updatePlayerPosition();
+        });
+        
+        moveDown.addEventListener('click', function() {
+            rigPosition.y += 20;
+            updatePlayerPosition();
+        });
+        
+        function updatePlayerPosition() {
+            playerRig.style.transform = `translate(calc(-50% + ${rigPosition.x}px), calc(-50% + ${rigPosition.y}px))`;
+            updateCanvasPosition();
+        }
+        
+        function updateCanvasPosition() {
+            switch(currentAnchor) {
+                case 'camera':
+                    uiCanvas.style.top = '-70px';
+                    uiCanvas.style.left = '50%';
+                    uiCanvas.style.transform = 'translateX(-50%)';
+                    break;
+                    
+                case 'rig':
+                    uiCanvas.style.top = '-80px';
+                    uiCanvas.style.left = '50%';
+                    uiCanvas.style.transform = 'translateX(-50%)';
+                    break;
+                    
+                case 'world':
+                    uiCanvas.style.top = '-70px';
+                    uiCanvas.style.left = `calc(50% - ${rigPosition.x}px)`;
+                    uiCanvas.style.transform = `translateX(-50%) translateY(${-rigPosition.y}px)`;
+                    break;
+                    
+                case 'controller':
+                    uiCanvas.style.top = '10px';
+                    uiCanvas.style.left = '50px';
+                    uiCanvas.style.transform = 'none';
+                    break;
+            }
+        }
+        
+        // Button hover effects
+        document.querySelectorAll('.move-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Initialize
+        updateCanvasPosition();
+    </script>
+
+
+</div>
+<script>
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        window.location.href = 'slide_19_update_ui_script.html';
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        window.location.href = 'slide_21_worldspace_canvas.html';
+    });
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            window.location.href = 'slide_21_worldspace_canvas.html';
+        } else if (e.key === 'ArrowLeft') {
+            window.location.href = 'slide_19_update_ui_script.html';
+        }
+    });
+</script>
+
+<!-- Responsive Footer Template -->
+<div class="responsive-footer">
+    <!-- Left section -->
+    <div class="footer-left">
+        <img src="assets/unity-logo.png" alt="Unity Logo" class="footer-logo">
+        <div class="slide-counter">
+            <span id="currentSlideNum">1</span> / <span id="totalSlides">45</span>
+        </div>
+    </div>
+    
+    <!-- Center section -->
+    <div class="footer-center">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="slideProgress"></div>
+        </div>
+    </div>
+    
+    <!-- Right section -->
+    <div class="footer-right">
+        <!-- First slide button -->
+        <div class="footer-tooltip">
+            <button id="firstSlideBtn" class="footer-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <span class="tooltip-text">First Slide</span>
+        </div>
+        
+        <!-- Previous slide button -->
+        <div class="footer-tooltip">
+            <button id="prevSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="tooltip-text">Previous Slide</span>
+        </div>
+        
+        <!-- Next slide button -->
+        <div class="footer-tooltip">
+            <button id="nextSlideBtn" class="footer-button">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span class="tooltip-text">Next Slide</span>
+        </div>
+        
+        <!-- Last slide button -->
+        <div class="footer-tooltip">
+            <button id="lastSlideBtn" class="footer-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <span class="tooltip-text">Last Slide</span>
+        </div>
+        
+        <!-- Theme toggle button -->
+        <div class="footer-tooltip">
+            <button id="themeBtn" class="footer-button">
+                <i class="fas fa-moon"></i>
+            </button>
+            <span class="tooltip-text">Toggle Theme</span>
+        </div>
+        
+        <!-- Notes button -->
+        <div class="footer-tooltip">
+            <button id="notesBtn" class="footer-button">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+            <span class="tooltip-text">Slide Notes</span>
+        </div>
+        
+        <!-- Fullscreen button -->
+        <div class="footer-tooltip">
+            <button id="fullscreenBtn" class="footer-button">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span class="tooltip-text">Fullscreen</span>
+        </div>
+        
+        <!-- Menu dropdown -->
+        <div class="footer-dropdown">
+            <div class="footer-tooltip">
+                <button id="menuBtn" class="footer-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="tooltip-text">Menu</span>
+            </div>
+            <div class="footer-dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="slide_00_cover.html">Cover</a>
+                <a href="slide_00_agenda.html">Agenda</a>
+                <a href="slide_16_break.html">Break 1</a>
+                <a href="slide_30_break.html">Break 2</a>
+                <a href="slide_40_thank_you.html">Thank You</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notesPanel" class="notes-panel">
+    <div class="notes-panel-header">
+        <h3>Slide Notes</h3>
+        <button id="closeNotesBtn" class="footer-button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="notes-panel-content">
+        <textarea id="slideNotes" placeholder="Add your notes for this slide..."></textarea>
+    </div>
+</div>
+
+<!-- Initialize footer functionality -->
+<script>
+    // Set current slide number and total
+    document.getElementById('currentSlideNum').textContent = 23;
+    document.getElementById('totalSlides').textContent = 45;
+    
+    // Update progress bar
+    document.getElementById('slideProgress').style.width = (CURRENT_SLIDE_NUMBER / TOTAL_SLIDES * 100) + '%';
+    
+    // Close notes panel button
+    document.getElementById('closeNotesBtn').addEventListener('click', function() {
+        document.getElementById('notesPanel').classList.remove('show');
+        document.getElementById('notesBtn').querySelector('i').className = 'fas fa-sticky-note';
+    });
+    
+    // Load saved notes if any
+    const slideId = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedNotes = localStorage.getItem('slideNotes_' + slideId);
+    if (savedNotes) {
+        document.getElementById('slideNotes').value = savedNotes;
+    }
+    
+    // Save notes when changed
+    document.getElementById('slideNotes').addEventListener('input', function() {
+        localStorage.setItem('slideNotes_' + slideId, this.value);
+    });
+</script>
+
+
+<script src="js/responsive-footer-fixed.js"></script>
+<script src="js/notes-panel-fixed.js"></script>
+</body>
+</html>
+
